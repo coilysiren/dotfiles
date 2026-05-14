@@ -91,7 +91,7 @@ If you want secrets at shell startup, append `ssm-load` to the end of `nu/config
 
 - `direnv` hook for nu - separate install, optional.
 - Login-shell switching - documented above, not automated.
-- Work (Kapwing) machine config stays on zsh per its bash-script dependencies. This repo is personal-only.
+- Work machine config stays on zsh per its bash-script dependencies. This repo is personal-only.
 
 ## Credits
 

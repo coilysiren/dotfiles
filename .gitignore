@@ -1,2 +1,14 @@
 .DS_Store
 *.swp
+
+# Defensive entries against secret drift
+.env
+.env.*
+.envrc
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+.aws/
+.ssh/
+*.kdbx
