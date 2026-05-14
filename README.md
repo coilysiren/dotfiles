@@ -18,11 +18,12 @@ Cross-platform shell + terminal setup. Same nu config and WezTerm config on Mac,
 
 ```bash
 brew install nushell wezterm
-mkdir -p ~/.config/nushell
-ln -sf "$PWD/nu/env.nu" ~/.config/nushell/env.nu
-ln -sf "$PWD/nu/config.nu" ~/.config/nushell/config.nu
-ln -sf "$PWD/nu/ssm-env.nu" ~/.config/nushell/ssm-env.nu
-ln -sf "$PWD/nu/hosts" ~/.config/nushell/hosts
+NU_CONFIG="$HOME/Library/Application Support/nushell"
+mkdir -p "$NU_CONFIG"
+ln -sf "$PWD/nu/env.nu" "$NU_CONFIG/env.nu"
+ln -sf "$PWD/nu/config.nu" "$NU_CONFIG/config.nu"
+ln -sf "$PWD/nu/ssm-env.nu" "$NU_CONFIG/ssm-env.nu"
+ln -sf "$PWD/nu/hosts" "$NU_CONFIG/hosts"
 ln -sf "$PWD/wezterm/wezterm.lua" ~/.wezterm.lua
 mkdir -p ~/.hammerspoon
 ln -sf "$PWD/hammerspoon/init.lua" ~/.hammerspoon/init.lua
