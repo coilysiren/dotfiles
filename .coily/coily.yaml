@@ -1,0 +1,5 @@
+# Per-repo command allowlist. No dev verbs declared yet; present so coily's
+# repocfg loader recognizes the repo and the lockdown discipline is uniform
+# across coilysiren/* checkouts. Add verbs here as they emerge.
+
+commands: {}
