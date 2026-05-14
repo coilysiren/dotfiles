@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import NoReturn
 
 try:
-    import yaml  # type: ignore[import-untyped]
+    import yaml  # type: ignore[import-untyped, unused-ignore]
 except ImportError:  # pragma: no cover
     print(
         "check-catalog-block: PyYAML not available. Install with `pip install pyyaml`.",
