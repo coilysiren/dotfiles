@@ -18,6 +18,7 @@ config.window_padding = { left = 4, right = 4, top = 4, bottom = 4 }
 config.use_fancy_tab_bar = false
 config.scrollback_lines = 50000
 config.audible_bell = 'Disabled'
+config.window_close_confirmation = 'NeverPrompt'
 
 -- Background: Sombra hacking skull (Overwatch, 2016 ARG era).
 -- Image lives in the dotfiles repo so it's the same across hosts.
