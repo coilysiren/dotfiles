@@ -54,6 +54,13 @@ config.scrollback_lines = 50000
 config.audible_bell = 'Disabled'
 config.window_close_confirmation = 'NeverPrompt'
 
+-- Default start directory: workspace root. Windows uses projects-x.
+if wezterm.target_triple:find('windows') then
+  config.default_cwd = wezterm.home_dir .. '\\projects-x\\coilysiren'
+else
+  config.default_cwd = wezterm.home_dir .. '/projects/coilysiren'
+end
+
 -- Background: Sombra hacking skull (Overwatch, 2016 ARG era).
 -- Image lives in the dotfiles repo so it's the same across hosts.
 local function dotfiles_dir()

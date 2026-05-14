@@ -10,6 +10,7 @@ Cross-platform shell + terminal setup. Same nu config and WezTerm config on Mac,
 - `nu/hosts/{macos,linux,windows}.nu` - per-host PATH and tooling. Picked automatically via `$nu.os-info.name`.
 - `nu/ssm-env.nu` - in-process AWS SSM secret loader. Replaces the old `~/.cache/ssm-env.sh` cleartext dump. Run `ssm-load` when you need secrets in your env. Nothing ever hits disk.
 - `wezterm/wezterm.lua` - terminal config. Single file for all three OSes. Windows entry includes a shell picker (Nushell / Git Bash / PowerShell / cmd).
+- `hammerspoon/init.lua` - Mac-only. Auto-presses Return after Wispr Flow finishes pasting dictated text, with a Cmd+A verify-and-retry pass for the times the first Return doesn't submit.
 
 ## Install
 
@@ -23,6 +24,8 @@ ln -sf "$PWD/nu/config.nu" ~/.config/nushell/config.nu
 ln -sf "$PWD/nu/ssm-env.nu" ~/.config/nushell/ssm-env.nu
 ln -sf "$PWD/nu/hosts" ~/.config/nushell/hosts
 ln -sf "$PWD/wezterm/wezterm.lua" ~/.wezterm.lua
+mkdir -p ~/.hammerspoon
+ln -sf "$PWD/hammerspoon/init.lua" ~/.hammerspoon/init.lua
 ```
 
 Optional - set nu as login shell:
