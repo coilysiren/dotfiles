@@ -51,3 +51,12 @@ Replaces the prior `~/.cache/ssm-env.sh` cleartext dump (deleted) and its `scrip
 ## Diagnostic scripts
 
 - **[scripts/gpg-doctor.nu](../scripts/gpg-doctor.nu)** - walks every check needed to diagnose `gpg failed to sign the data` from a `git commit`. Verifies binaries, gpg-agent socket, git config, secret-key presence, optional YubiKey, then runs a real sign test. Names the most-likely fix for each failure mode. Run with `nu scripts/gpg-doctor.nu`.
+
+## Portable utility scripts
+
+Generic-purpose scripts pulled out of `coilyco-ai/scripts/` because they have no Kai-specific path coupling. Originals still live in coilyco-ai for now to keep its setup.sh and commit-hook rollout working.
+
+- **[scripts/verbatim-echo.sh](../scripts/verbatim-echo.sh)** - run a command and emit its output wrapped in a fenced code block, clipped to 20 lines / 100 chars per line. Used by the `$$ <cmd>` chat convention so mobile chat sees command output without blowing the context window.
+- **[scripts/check-aws-config.py](../scripts/check-aws-config.py)** - lint `~/.aws/config` for the `[profile default]` trap. AWS SDKs read `[default]`, never `[profile default]`, so a `region =` placed under the latter is unreachable and surfaces later as a cryptic `NoRegion` from SSM/S3. STS-only preflights hide the bug.
+- **[scripts/gpg-ssm](../scripts/gpg-ssm)** / **[scripts/gpg-ssm.cmd](../scripts/gpg-ssm.cmd)** - GPG signing wrapper. Pulls the signing-key passphrase from AWS SSM at `/coilysiren/gpg-passphrase/<keyid>` instead of caching it in macOS Keychain or anywhere on disk. Per-host signing key keeps the blast radius of a stolen laptop to one key. Wire-up Mac/Linux: `git config --global gpg.program "$HOME/.local/bin/gpg-ssm"`. Windows uses the `.cmd` shim that wraps the same bash script via `bash.exe`, since Git for Windows can't reliably invoke extensionless shebang scripts.
+- **[scripts/check-commit-closes-issue.py](../scripts/check-commit-closes-issue.py)** - commit-msg pre-commit hook. Rejects commits that lack a same-repo GitHub closing keyword (`closes #N` / `fixes #N` / `resolves #N`, case-insensitive).

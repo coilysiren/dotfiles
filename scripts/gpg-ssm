@@ -1,0 +1,75 @@
+#!/usr/bin/env bash
+# gpg-ssm - GPG wrapper that pulls the signing-key passphrase from AWS SSM
+# instead of caching it in macOS Keychain or anywhere else on disk.
+#
+# Wire-up:
+#   git config --global gpg.program "$HOME/.local/bin/gpg-ssm"
+#
+# SSM param: /coilysiren/gpg-passphrase/<keyid>  (SecureString)
+# Where <keyid> is read from `git config --global --get user.signingkey`,
+# so each host's own keypair maps to its own SSM param. Per-machine keys
+# mean a stolen laptop only burns one key, not the whole identity.
+#
+# Behavior:
+#   - Verification / non-signing gpg invocations pass through untouched.
+#   - For signing invocations, runs `aws sts get-caller-identity` first as
+#     a fail-fast credential gate, then fetches the passphrase from SSM and
+#     hands it to gpg via --passphrase-fd 3 (no command-line exposure).
+#   - After the first successful sign in a session, gpg-agent caches the
+#     unlocked key in memory and subsequent signs reuse it without
+#     re-invoking SSM (provided default-cache-ttl in gpg-agent.conf is
+#     long enough; ~1yr is the recommended setting).
+set -euo pipefail
+
+# Git Bash mangles leading-slash args into Windows paths; opt out so SSM
+# names like /coilysiren/gpg-passphrase survive intact.
+case "$(uname -s)" in
+  MINGW*|MSYS*|CYGWIN*) export MSYS_NO_PATHCONV=1 ;;
+esac
+
+needs_sign=0
+for arg in "$@"; do
+  case "$arg" in
+    --sign|--clearsign|--clear-sign|--detach-sign)
+      needs_sign=1
+      break
+      ;;
+    --*)
+      # Some other long option; not a signing trigger.
+      ;;
+    -*s*)
+      # Short-option bundle containing 's' (e.g. -s, -bs, -bsau as git
+      # itself invokes us). Match via glob since gpg combines flags.
+      needs_sign=1
+      break
+      ;;
+  esac
+done
+
+if [ "$needs_sign" -eq 0 ]; then
+  exec gpg "$@"
+fi
+
+keyid=$(git config --global --get user.signingkey 2>/dev/null || true)
+if [ -z "$keyid" ]; then
+  echo "gpg-ssm: user.signingkey is unset in global git config; can't resolve SSM passphrase param." >&2
+  exit 1
+fi
+
+if ! coily ops aws sts get-caller-identity >/dev/null 2>&1; then
+  echo "gpg-ssm: AWS credentials expired or missing. Run 'aws sso login' and retry." >&2
+  exit 1
+fi
+
+ssm_name="/coilysiren/gpg-passphrase/$keyid"
+pass=$(coily ops aws ssm get-parameter \
+  --name "$ssm_name" \
+  --with-decryption \
+  --query Parameter.Value \
+  --output text 2>/dev/null) || {
+  echo "gpg-ssm: failed to fetch $ssm_name from SSM." >&2
+  exit 1
+}
+
+exec gpg --batch --pinentry-mode loopback --passphrase-fd 3 "$@" \
+  3< <(printf '%s' "$pass")
