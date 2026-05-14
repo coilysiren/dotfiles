@@ -30,20 +30,35 @@ if is_windows then
     { label = 'PowerShell 5', args = { 'powershell.exe', '-NoLogo' } },
     { label = 'cmd',         args = { 'cmd.exe' } },
   }
-elseif is_mac then
-  config.default_prog = { '/opt/homebrew/bin/nu' }
-  config.launch_menu = {
-    { label = 'Nushell', args = { '/opt/homebrew/bin/nu' } },
-    { label = 'zsh',     args = { '/bin/zsh', '-l' } },
-    { label = 'bash',    args = { '/bin/bash', '-l' } },
-  }
 else
-  -- Linux
-  config.default_prog = { '/home/linuxbrew/.linuxbrew/bin/nu' }
-  config.launch_menu = {
-    { label = 'Nushell', args = { '/home/linuxbrew/.linuxbrew/bin/nu' } },
-    { label = 'bash',    args = { '/bin/bash', '-l' } },
-  }
+  -- Resolve nu against the candidate paths brew/cargo/linuxbrew put it at.
+  local function find_nu()
+    local candidates = {
+      '/opt/homebrew/bin/nu',
+      '/usr/local/bin/nu',
+      wezterm.home_dir .. '/.cargo/bin/nu',
+      '/home/linuxbrew/.linuxbrew/bin/nu',
+    }
+    for _, p in ipairs(candidates) do
+      local f = io.open(p, 'r')
+      if f then f:close() return p end
+    end
+    return 'nu'
+  end
+  local nu = find_nu()
+  config.default_prog = { nu }
+  if is_mac then
+    config.launch_menu = {
+      { label = 'Nushell', args = { nu } },
+      { label = 'zsh',     args = { '/bin/zsh', '-l' } },
+      { label = 'bash',    args = { '/bin/bash', '-l' } },
+    }
+  else
+    config.launch_menu = {
+      { label = 'Nushell', args = { nu } },
+      { label = 'bash',    args = { '/bin/bash', '-l' } },
+    }
+  end
 end
 
 -- Keys
