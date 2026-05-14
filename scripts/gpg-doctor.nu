@@ -86,16 +86,53 @@ if (have "ykman") {
 # 6. The real test: sign a tiny payload --------------------------------------
 heading "sign test"
 let test = (do { echo "gpg-doctor test" | ^gpg --clearsign --batch --pinentry-mode error } | complete)
-if $test.exit_code == 0 {
-  status true "signing works"
+status ($test.exit_code == 0) "bare gpg --clearsign"
+if $test.exit_code != 0 {
+  print $"  ($test.stderr | str trim)"
+}
+
+# 6b. Also sign-test through git's configured gpg.program if it's a wrapper.
+# git invokes that program, not bare gpg, so a wrapper failure breaks
+# `git commit` even when bare gpg works.
+let gpg_program = (^git config --global gpg.program | complete | get stdout | str trim)
+let bare_gpg = (which gpg | get path.0? | default "")
+let wrapper_test = if (($gpg_program | str length) > 0) and ($gpg_program != $bare_gpg) {
+  if not ($gpg_program | path exists) {
+    status false $"gpg.program ($gpg_program) does not exist on disk"
+    null
+  } else {
+    let r = (do { echo "gpg-doctor test" | ^$gpg_program --clearsign --batch } | complete)
+    status ($r.exit_code == 0) $"gpg.program wrapper: ($gpg_program)"
+    if $r.exit_code != 0 {
+      print $"  ($r.stderr | str trim)"
+    }
+    $r
+  }
+} else {
+  null
+}
+
+let wrapper_ok = ($wrapper_test == null) or ($wrapper_test.exit_code == 0)
+let bare_ok = ($test.exit_code == 0)
+
+if $bare_ok and $wrapper_ok {
   print ""
   print "All checks passed. Retry your `git commit`."
   exit 0
-} else {
-  status false "signing failed"
+} else if $bare_ok and (not $wrapper_ok) {
   print ""
-  print "Error from gpg:"
-  print $"  ($test.stderr | str trim)"
+  print $"Bare gpg signs fine but gpg.program (($gpg_program)) fails."
+  print "git uses gpg.program for commit signing, so commits will still break."
+  print ""
+  print "Most-likely fixes:"
+  print "  1. Run the wrapper directly to see its raw error:"
+  print $"       echo test | ($gpg_program) --clearsign --batch"
+  print "  2. If the wrapper shells out to other tools (aws, ssm, vault, etc.),"
+  print "     check whether the current shell can reach them (lockdown, PATH, creds)."
+  print "  3. Unset gpg.program temporarily as a workaround:"
+  print "       git -c gpg.program=gpg commit ..."
+  exit 1
+} else {
   print ""
   print "Most-likely fixes, in order:"
   print "  1. Touch your YubiKey if it's plugged in (gpg waits silently for the touch)."
