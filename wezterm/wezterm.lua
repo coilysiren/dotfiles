@@ -4,6 +4,11 @@
 local wezterm = require 'wezterm'
 local config = wezterm.config_builder()
 
+wezterm.on('gui-startup', function(cmd)
+  local _, _, window = wezterm.mux.spawn_window(cmd or {})
+  window:gui_window():maximize()
+end)
+
 config.color_scheme = 'Tokyo Night'
 config.font = wezterm.font 'JetBrains Mono'
 config.font_size = 13.0
