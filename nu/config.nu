@@ -114,12 +114,12 @@ $env.PROMPT_COMMAND = {||
   let user = (whoami | str trim)
   let host = (sys host | get hostname | split row "." | first)
   let cwd = (pwd | str replace $nu.home-dir "~")
-  $"(ansi cyan_dimmed)🕐 ($time)(ansi reset)  (ansi magenta_bold)🧜 ($user)(ansi reset)(ansi default_dimmed)@($host)(ansi reset)  (ansi blue)📂 ($cwd)(ansi reset)(_prompt-git)(_prompt-exit)"
+  $"(ansi cyan_dimmed)🕐 ($time)(ansi reset)  (ansi magenta_bold)🧜 ($user)(ansi reset)(ansi default_dimmed)@($host)(ansi reset)  (ansi blue)📂 ($cwd)(ansi reset)(_prompt-git)(_prompt-exit)\n"
 }
 $env.PROMPT_COMMAND_RIGHT = {|| "" }
-$env.PROMPT_INDICATOR = $"\n(ansi magenta_bold)$(ansi reset) "
-$env.PROMPT_INDICATOR_VI_INSERT = $"\n(ansi cyan_bold)$(ansi reset) "
-$env.PROMPT_INDICATOR_VI_NORMAL = $"\n(ansi yellow_bold)$(ansi reset) "
+$env.PROMPT_INDICATOR = $"(ansi magenta_bold)$(ansi reset) "
+$env.PROMPT_INDICATOR_VI_INSERT = $"(ansi cyan_bold)$(ansi reset) "
+$env.PROMPT_INDICATOR_VI_NORMAL = $"(ansi yellow_bold)$(ansi reset) "
 $env.PROMPT_MULTILINE_INDICATOR = $"(ansi default_dimmed)···(ansi reset) "
 
 # ─── Integrations ─────────────────────────────────────────────────────────────
