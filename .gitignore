@@ -12,3 +12,4 @@ id_ed25519*
 .aws/
 .ssh/
 *.kdbx
+kai-server.conf
