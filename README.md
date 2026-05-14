@@ -1,0 +1,76 @@
+# dotfiles
+
+Cross-platform shell + terminal setup. Same nu config and WezTerm config on Mac, Linux, and Windows.
+
+## Layout
+
+- `nu/env.nu`, `nu/config.nu` - entry points sourced by nushell at startup. `env.nu` runs first, sets env and PATH, sources the right host file.
+- `nu/hosts/{macos,linux,windows}.nu` - per-host PATH and tooling. Picked automatically via `$nu.os-info.name`.
+- `nu/ssm-env.nu` - in-process AWS SSM secret loader. Replaces the old `~/.cache/ssm-env.sh` cleartext dump. Run `ssm-load` when you need secrets in your env. Nothing ever hits disk.
+- `wezterm/wezterm.lua` - terminal config. Single file for all three OSes. Windows entry includes a shell picker (Nushell / Git Bash / PowerShell / cmd).
+
+## Install
+
+### Mac
+
+```bash
+brew install nushell wezterm
+mkdir -p ~/.config/nushell
+ln -sf "$PWD/nu/env.nu" ~/.config/nushell/env.nu
+ln -sf "$PWD/nu/config.nu" ~/.config/nushell/config.nu
+ln -sf "$PWD/nu/ssm-env.nu" ~/.config/nushell/ssm-env.nu
+ln -sf "$PWD/nu/hosts" ~/.config/nushell/hosts
+ln -sf "$PWD/wezterm/wezterm.lua" ~/.wezterm.lua
+```
+
+Optional - set nu as login shell:
+
+```bash
+echo "$(which nu)" | sudo tee -a /etc/shells
+chsh -s "$(which nu)"
+```
+
+### Linux (kai-server)
+
+```bash
+brew install nushell wezterm  # or distro package
+mkdir -p ~/.config/nushell
+ln -sf "$PWD/nu/env.nu" ~/.config/nushell/env.nu
+ln -sf "$PWD/nu/config.nu" ~/.config/nushell/config.nu
+ln -sf "$PWD/nu/ssm-env.nu" ~/.config/nushell/ssm-env.nu
+ln -sf "$PWD/nu/hosts" ~/.config/nushell/hosts
+ln -sf "$PWD/wezterm/wezterm.lua" ~/.wezterm.lua
+```
+
+### Windows (Git Bash)
+
+```bash
+winget install Nushell.Nushell wez.wezterm-nightly
+mkdir -p "$APPDATA/nushell"
+cp nu/env.nu nu/config.nu nu/ssm-env.nu "$APPDATA/nushell/"
+cp -r nu/hosts "$APPDATA/nushell/"
+cp wezterm/wezterm.lua "$USERPROFILE/.wezterm.lua"
+```
+
+(Windows symlinks need admin or developer mode, so copy is simpler. Re-run after edits.)
+
+## Secrets pattern
+
+The legacy pattern wrote all SSM SecureStrings to `~/.cache/ssm-env.sh` and sourced it from `.zshenv`. That cleartext-on-disk dump has been deleted.
+
+The new pattern:
+
+```nu
+ssm-load                          # pull every / parameter into current process env
+ssm-get /eco/server-api-token     # fetch one value without storing it
+```
+
+No disk write at any point. Same call works on Mac, Linux, Windows. AWS profile defaults to `coilysiren`; override with `--profile`.
+
+If you want secrets at shell startup, append `ssm-load` to the end of `nu/config.nu`. Default behavior is opt-in per shell.
+
+## What's not here (yet)
+
+- `direnv` hook for nu - separate install, optional.
+- Login-shell switching - documented above, not automated.
+- Work (Kapwing) machine config stays on zsh per its bash-script dependencies. This repo is personal-only.
