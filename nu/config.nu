@@ -81,9 +81,15 @@ def count-lines [] {
 }
 
 # ─── Prompt ───────────────────────────────────────────────────────────────────
-# Native prompt. No starship dependency so this works on every platform that
-# can run nushell. Shows cwd (with $HOME collapsed to ~) and, when inside a
-# git repo, the branch with a '*' marker for a dirty working tree.
+# Two-line native prompt. No starship dependency so this works on every
+# platform that runs nushell.
+#
+# Line 1 (info):  [HH:MM:SS] user@host cwd (branch*)
+# Line 2 (input): $
+#
+#   - cwd has $HOME collapsed to ~.
+#   - git branch + '*' dirty marker appears only inside a git repo.
+#   - hostname is the short form (split on '.').
 
 def _prompt-git [] {
   let head = (^git symbolic-ref --short HEAD | complete)
@@ -95,13 +101,16 @@ def _prompt-git [] {
 }
 
 $env.PROMPT_COMMAND = {||
+  let time = (date now | format date "%H:%M:%S")
+  let user = (whoami | str trim)
+  let host = (sys host | get hostname | split row "." | first)
   let cwd = (pwd | str replace $nu.home-dir "~")
-  $"($cwd)(_prompt-git)"
+  $"[($time)] ($user)@($host) ($cwd)(_prompt-git)"
 }
 $env.PROMPT_COMMAND_RIGHT = {|| "" }
-$env.PROMPT_INDICATOR = "> "
-$env.PROMPT_INDICATOR_VI_INSERT = ": "
-$env.PROMPT_INDICATOR_VI_NORMAL = "> "
+$env.PROMPT_INDICATOR = "\n$ "
+$env.PROMPT_INDICATOR_VI_INSERT = "\n: "
+$env.PROMPT_INDICATOR_VI_NORMAL = "\n$ "
 $env.PROMPT_MULTILINE_INDICATOR = "::: "
 
 # ─── Integrations ─────────────────────────────────────────────────────────────
