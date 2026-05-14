@@ -80,9 +80,33 @@ def count-lines [] {
   } | sort-by lines --reverse
 }
 
+# ─── Prompt ───────────────────────────────────────────────────────────────────
+# Native prompt. No starship dependency so this works on every platform that
+# can run nushell. Shows cwd (with $HOME collapsed to ~) and, when inside a
+# git repo, the branch with a '*' marker for a dirty working tree.
+
+def _prompt-git [] {
+  let head = (^git symbolic-ref --short HEAD | complete)
+  if $head.exit_code != 0 { return "" }
+  let branch = ($head.stdout | str trim)
+  let porcelain = (^git status --porcelain | complete | get stdout | str trim)
+  let dirty = if ($porcelain | str length) > 0 { "*" } else { "" }
+  $" \(($branch)($dirty)\)"
+}
+
+$env.PROMPT_COMMAND = {||
+  let cwd = (pwd | str replace $nu.home-dir "~")
+  $"($cwd)(_prompt-git)"
+}
+$env.PROMPT_COMMAND_RIGHT = {|| "" }
+$env.PROMPT_INDICATOR = "> "
+$env.PROMPT_INDICATOR_VI_INSERT = ": "
+$env.PROMPT_INDICATOR_VI_NORMAL = "> "
+$env.PROMPT_MULTILINE_INDICATOR = "::: "
+
 # ─── Integrations ─────────────────────────────────────────────────────────────
 # direnv hook: nu has a community port. If not installed, this is a no-op.
-# zoxide / starship / atuin can be added later.
+# zoxide / atuin can be added later.
 
 # GitHub PAT - lazy: only fetched when a command actually reads $env.GITHUB_PERSONAL_ACCESS_TOKEN.
 # (zsh used to eagerly call `gh auth token` on every shell start; nu defers.)
