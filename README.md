@@ -74,3 +74,7 @@ If you want secrets at shell startup, append `ssm-load` to the end of `nu/config
 - `direnv` hook for nu - separate install, optional.
 - Login-shell switching - documented above, not automated.
 - Work (Kapwing) machine config stays on zsh per its bash-script dependencies. This repo is personal-only.
+
+## Credits
+
+- `static/wallpaper.jpg` - Sombra hacking skull, from the [Overwatch](https://overwatch.blizzard.com) Sombra ARG promotional materials, Blizzard Entertainment, circa 2016. All Overwatch art and iconography © Blizzard Entertainment. Used here for personal terminal decoration only.
