@@ -6,11 +6,45 @@ local config = wezterm.config_builder()
 
 wezterm.on('gui-startup', function(cmd)
   local _, _, window = wezterm.mux.spawn_window(cmd or {})
-  window:gui_window():maximize()
+  local gui = window:gui_window()
+  if wezterm.target_triple:find('darwin') then
+    -- Native macOS fullscreen so WezTerm gets its own Mission Control Space.
+    gui:toggle_fullscreen()
+  else
+    gui:maximize()
+  end
 end)
 
+-- Use the real green-button fullscreen on Mac (own Space) instead of WezTerm's
+-- borderless-cover-the-desktop mode.
+config.native_macos_fullscreen_mode = true
+
 config.color_scheme = 'Tokyo Night'
-config.font = wezterm.font 'JetBrains Mono'
+
+-- Cross-platform fonts: load the Monaspace variable TTFs out of this repo
+-- instead of relying on a system font install. Same config works on Mac,
+-- Linux, and Windows as long as the dotfiles checkout is reachable.
+local function fonts_dir()
+  if wezterm.target_triple:find('windows') then
+    return wezterm.home_dir .. '\\projects-x\\coilysiren\\dotfiles\\wezterm\\fonts'
+  end
+  return wezterm.home_dir .. '/projects/coilysiren/dotfiles/wezterm/fonts'
+end
+-- font_dirs is additive: WezTerm still falls back to system fonts for emoji,
+-- glyph fallback, etc. Don't set font_locator = 'ConfigDirsOnly' or that breaks.
+config.font_dirs = { fonts_dir() }
+
+-- Monaspace family: WezTerm picks a different sibling style per attribute,
+-- which is exactly what githubnext designed the family for.
+-- Neon (neo-grotesque) for regular code, Radon (handwriting) for italics
+-- (comments mostly), Xenon (slab) for bold, Krypton for bold-italic.
+config.font = wezterm.font 'Monaspace Neon'
+config.font_rules = {
+  { italic = true,                intensity = 'Normal', font = wezterm.font { family = 'Monaspace Radon',   style = 'Italic' } },
+  { italic = false,               intensity = 'Bold',   font = wezterm.font { family = 'Monaspace Xenon',   weight = 'Bold' } },
+  { italic = true,                intensity = 'Bold',   font = wezterm.font { family = 'Monaspace Krypton', weight = 'Bold', style = 'Italic' } },
+  { italic = false,               intensity = 'Half',   font = wezterm.font { family = 'Monaspace Neon',    weight = 'Light' } },
+}
 config.font_size = 13.0
 config.hide_tab_bar_if_only_one_tab = true
 config.window_decorations = 'RESIZE'
