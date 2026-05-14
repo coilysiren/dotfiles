@@ -81,23 +81,32 @@ def count-lines [] {
 }
 
 # ─── Prompt ───────────────────────────────────────────────────────────────────
-# Two-line native prompt. No starship dependency so this works on every
-# platform that runs nushell.
+# Two-line native prompt with a siren motif. No starship dependency so this
+# works on every platform that runs nushell.
 #
-# Line 1 (info):  [HH:MM:SS] user@host cwd (branch*)
+# Line 1 (info):  🕐 HH:MM:SS  🧜 user@host  📂 cwd  ⚓ branch ✨  💥 N
 # Line 2 (input): $
 #
 #   - cwd has $HOME collapsed to ~.
-#   - git branch + '*' dirty marker appears only inside a git repo.
-#   - hostname is the short form (split on '.').
+#   - ⚓ branch appears only inside a git repo. ✨ marks a dirty tree.
+#   - 💥 N appears only when the previous command exited non-zero.
+#   - hostname is the short form (split on the first dot).
+#   - colors are nushell ansi names; 'reset' clears between segments so the
+#     line doesn't bleed into command output.
 
 def _prompt-git [] {
   let head = (^git symbolic-ref --short HEAD | complete)
   if $head.exit_code != 0 { return "" }
   let branch = ($head.stdout | str trim)
   let porcelain = (^git status --porcelain | complete | get stdout | str trim)
-  let dirty = if ($porcelain | str length) > 0 { "*" } else { "" }
-  $" \(($branch)($dirty)\)"
+  let dirty = if ($porcelain | str length) > 0 { $" (ansi yellow_bold)✨(ansi reset)" } else { "" }
+  $"  (ansi cyan)⚓ ($branch)(ansi reset)($dirty)"
+}
+
+def _prompt-exit [] {
+  let code = ($env.LAST_EXIT_CODE? | default 0)
+  if $code == 0 { return "" }
+  $"  (ansi red_bold)💥 ($code)(ansi reset)"
 }
 
 $env.PROMPT_COMMAND = {||
@@ -105,13 +114,13 @@ $env.PROMPT_COMMAND = {||
   let user = (whoami | str trim)
   let host = (sys host | get hostname | split row "." | first)
   let cwd = (pwd | str replace $nu.home-dir "~")
-  $"[($time)] ($user)@($host) ($cwd)(_prompt-git)"
+  $"(ansi cyan_dimmed)🕐 ($time)(ansi reset)  (ansi magenta_bold)🧜 ($user)(ansi reset)(ansi default_dimmed)@($host)(ansi reset)  (ansi blue)📂 ($cwd)(ansi reset)(_prompt-git)(_prompt-exit)"
 }
 $env.PROMPT_COMMAND_RIGHT = {|| "" }
-$env.PROMPT_INDICATOR = "\n$ "
-$env.PROMPT_INDICATOR_VI_INSERT = "\n: "
-$env.PROMPT_INDICATOR_VI_NORMAL = "\n$ "
-$env.PROMPT_MULTILINE_INDICATOR = "::: "
+$env.PROMPT_INDICATOR = $"\n(ansi magenta_bold)$(ansi reset) "
+$env.PROMPT_INDICATOR_VI_INSERT = $"\n(ansi cyan_bold)$(ansi reset) "
+$env.PROMPT_INDICATOR_VI_NORMAL = $"\n(ansi yellow_bold)$(ansi reset) "
+$env.PROMPT_MULTILINE_INDICATOR = $"(ansi default_dimmed)···(ansi reset) "
 
 # ─── Integrations ─────────────────────────────────────────────────────────────
 # direnv hook: nu has a community port. If not installed, this is a no-op.
