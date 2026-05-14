@@ -31,9 +31,10 @@ Replaces the prior `~/.cache/ssm-env.sh` cleartext dump (deleted) and its `scrip
 
 - **Cross-platform nu resolution** - walks `/opt/homebrew/bin/nu`, `/usr/local/bin/nu`, `~/.cargo/bin/nu`, `/home/linuxbrew/.linuxbrew/bin/nu`, falls back to bare `nu` on PATH.
 - **Launch menu** - per-OS shell picker. Windows: Nushell / Git Bash / PowerShell 7 / PowerShell 5 / cmd. Mac: Nushell / zsh / bash. Linux: Nushell / bash. Bound to `Ctrl+Shift+Space`.
-- **Maximized startup** - `gui-startup` event handler maximizes the spawned window on every launch.
+- **Startup window state** - `gui-startup` event handler. On macOS, native fullscreen (own Mission Control Space) via `native_macos_fullscreen_mode = true`. On Linux/Windows, maximize.
 - **Background image** - dimmed Sombra hacking skull wallpaper from [static/wallpaper.jpg](../static/wallpaper.jpg). Brightness 0.08, saturation 0.7. Path resolves per-OS to the dotfiles checkout.
-- **Theme** - Tokyo Night, JetBrains Mono 13pt, 50k scrollback, audible bell disabled.
+- **Fonts** - Monaspace family bundled in [wezterm/fonts/](../wezterm/fonts/) so the config is self-contained across hosts. Per-attribute style swap: Neon (regular), Radon (italic / comments), Xenon (bold), Krypton (bold-italic), Light variant for half-intensity. `font_dirs` is additive so system emoji/glyph fallback still works.
+- **Theme + chrome** - Tokyo Night, 13pt, 50k scrollback, audible bell disabled, no close-window confirmation, `RESIZE`-only window decorations.
 
 ## Install surface
 

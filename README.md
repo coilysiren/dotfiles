@@ -1,5 +1,7 @@
 # dotfiles
 
+![Sombra hacking skull](static/wallpaper.jpg)
+
 Cross-platform shell + terminal setup. Same nu config and WezTerm config on Mac, Linux, and Windows.
 
 ## Layout
