@@ -3,3 +3,16 @@
 # across coilysiren/* checkouts. Add verbs here as they emerge.
 
 commands: {}
+
+# Catalog metadata for the cross-repo knowledge graph.
+# Schema: coilysiren/coilyco-ai#420 (tracker).
+catalog:
+  kind: Component
+  type: configuration
+  system: ops
+  owner: kai
+  lifecycle: production
+  description: "Personal dotfiles, shell config, GPG/SSM tooling, and shared utility scripts symlinked into sibling coilysiren/* repos."
+  dependsOn: []
+  providesApis:
+    - shared-scripts
