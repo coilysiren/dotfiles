@@ -10,6 +10,7 @@ $env.PATH = (
     "/usr/local/sbin"
     $"($env.HOME)/bin"
     $"($env.HOME)/.local/bin"
+    $"($env.HOME)/.pyenv/shims"
     $"($env.HOME)/.cargo/bin"
     "/opt/homebrew/opt/ruby/bin"
     $"($env.HOME)/.gem/ruby/3.4.0/bin"
