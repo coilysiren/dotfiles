@@ -36,6 +36,18 @@ Replaces the prior `~/.cache/ssm-env.sh` cleartext dump (deleted) and its `scrip
 - **Fonts** - Monaspace family bundled in [wezterm/fonts/](../wezterm/fonts/) so the config is self-contained across hosts. Per-attribute style swap: Neon (regular), Radon (italic / comments), Xenon (bold), Krypton (bold-italic), Light variant for half-intensity. `font_dirs` is additive so system emoji/glyph fallback still works.
 - **Theme + chrome** - Tokyo Night, 13pt, 50k scrollback, audible bell disabled, no close-window confirmation, `RESIZE`-only window decorations.
 
+## Hammerspoon config (Mac)
+
+[hammerspoon/init.lua](../hammerspoon/init.lua) - symlinked to `~/.hammerspoon/init.lua`. Mac-only.
+
+- **Wispr Flow auto-Return** - watches for release of the Flow trigger key (default `fn`), polls `hs.pasteboard.changeCount` for up to 3s, and fires Return once paste lands.
+- **Verify-and-retry** - after firing Return, waits 180ms then does Cmd+A / Cmd+C. If the pasteboard changeCount ticks, the input still has text (Return didn't submit), so Right-arrow to deselect and fire Return again. Up to 2 retries.
+- **Blocklist** - skips VSCode, Terminal, iTerm2, WezTerm, Obsidian, TextEdit, where Return inserts a newline rather than submitting.
+
 ## Install surface
 
 [README.md](../README.md) carries per-OS install steps. Mac and Linux use symlinks; Windows uses copy (symlinks need admin/dev mode).
+
+## Diagnostic scripts
+
+- **[scripts/gpg-doctor.nu](../scripts/gpg-doctor.nu)** - walks every check needed to diagnose `gpg failed to sign the data` from a `git commit`. Verifies binaries, gpg-agent socket, git config, secret-key presence, optional YubiKey, then runs a real sign test. Names the most-likely fix for each failure mode. Run with `nu scripts/gpg-doctor.nu`.
