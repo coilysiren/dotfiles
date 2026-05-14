@@ -14,6 +14,25 @@ config.use_fancy_tab_bar = false
 config.scrollback_lines = 50000
 config.audible_bell = 'Disabled'
 
+-- Background: Sombra hacking skull (Overwatch, 2016 ARG era).
+-- Image lives in the dotfiles repo so it's the same across hosts.
+local function dotfiles_dir()
+  if wezterm.target_triple:find('windows') then
+    return wezterm.home_dir .. '\\projects-x\\coilysiren\\dotfiles'
+  end
+  return wezterm.home_dir .. '/projects/coilysiren/dotfiles'
+end
+config.background = {
+  {
+    source = { File = dotfiles_dir() .. '/static/wallpaper.jpg' },
+    hsb = { brightness = 0.08, saturation = 0.7 },
+    width = 'Cover',
+    height = 'Cover',
+    horizontal_align = 'Center',
+    vertical_align = 'Middle',
+  },
+}
+
 -- Platform branching
 local is_windows = wezterm.target_triple:find('windows') ~= nil
 local is_mac = wezterm.target_triple:find('darwin') ~= nil
