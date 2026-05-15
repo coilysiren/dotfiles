@@ -19,8 +19,8 @@ The rest of this file carries opinionated authoring discipline the handbook does
 
 When co-locating, the host repo must:
 
-1. Subscribe to [`coilysiren/claude-skill-discipline`](https://github.com/coilysiren/claude-skill-discipline) in its `.pre-commit-config.yaml`. Pin to a tag. That repo ships the structural validator, cross-link checker, and commit-msg gate.
-2. Ship a slim `.claude/skills/categories.yaml` at the skills root with only the categories the repo actually uses. The upstream validator reads this path directly.
+1. Receive the skill-discipline pre-commit hooks via `make apply-skill-discipline-hooks` from `agentic-os-kai`. That rollout stamps `scripts/validate-skills.py` and `scripts/check-dead-links.py` into the host repo (canonical copies live in [`coilysiren/agentic-os/scripts/`](https://github.com/coilysiren/agentic-os/tree/main/scripts)) and inserts a managed `repo: local` block in `.pre-commit-config.yaml`. See [agentic-os-kai#544](https://github.com/coilysiren/agentic-os-kai/issues/544).
+2. Ship a slim `.claude/skills/categories.yaml` at the skills root with only the categories the repo actually uses. The validator reads this path directly.
 3. Run `pre-commit install` in the host repo. That activates the hooks for every commit.
 
 No `setup.sh` is required in the host repo. Claude Code auto-discovers skills under any `.claude/skills/` in the working tree.

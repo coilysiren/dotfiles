@@ -1,0 +1,117 @@
+# Example .claude/skills/categories.yaml
+#
+# Copy this file to your consumer repo at .claude/skills/categories.yaml and
+# trim or extend to fit your skill surface. Source of truth for the
+# `skill-conventions` hook from claude-skill-discipline.
+#
+# Each entry under `categories` is either:
+#   - a prefix family (every skill whose directory name starts with the prefix
+#     matches the entry), or
+#   - a single named skill that does not follow a prefix family.
+#
+# Per-category fields:
+#   id:                    short identifier used in error messages.
+#   kind:                  "prefix" or "exact".
+#   prefix / exact:        the matching name fragment.
+#   enforce_status:        if true, the SKILL.md must carry a status line
+#                          right under the H1, in the form
+#                          `Status: <emoji> <Kind> | Last <updated|tested>: YYYY-MM-DD`
+#                          and the emoji must pair with the kind.
+#   status_freshness:      "updated" or "tested" - picks which label the
+#                          status line carries.
+#   status_kinds:          map of {Kind: emoji}. Status line must use a
+#                          matching pair.
+#   h1_pattern_by_status:  per-kind regex the H1 must match.
+#   required_sections:     per-status mapping of {Kind: [H2 names]}.
+#   section_lead_lines:    map of {section_name: regex} - first non-blank
+#                          line of the section must match.
+#   forbidden_names:       skills that MUST NOT exist under this prefix.
+#
+# Top-level fields (optional):
+#   max_skill_md_lines / max_skill_md_bytes: override the 500 / 10_000 caps.
+#   max_description_bytes: override the 500-byte description cap (0 disables).
+#   archive_path_components: list of path components that mark frozen-archive
+#     sub-trees. Any .md whose path contains one of these is skipped from
+#     size-cap checks (still validated for stale refs etc.). Archives are
+#     loaded by name on revisit, not on trigger, so the cap earns nothing
+#     there. Default empty. Example: ['results'].
+
+# Example archive exemption (uncomment in your consumer if you use one):
+# archive_path_components:
+#   - results
+
+categories:
+
+  # Prefix family. Every skill named `coding-*` matches this entry.
+  - id: coding
+    kind: prefix
+    prefix: coding-
+    enforce_status: false
+
+  # Exact-name skill. Only the directory named exactly `playbook-router`
+  # matches; subsection rules apply just to that one.
+  - id: playbook-router
+    kind: exact
+    exact: playbook-router
+    enforce_status: true
+    status_freshness: updated
+    status_kinds:
+      Router: '🗺'
+    h1_pattern_by_status:
+      Router: '.+'
+    required_sections:
+      by_status:
+        Router:
+          - Routing table
+
+  # Prefix family with required sections per status. Use this shape when a
+  # category has a fixed runbook-style structure.
+  - id: playbook
+    kind: prefix
+    prefix: playbook-
+    enforce_status: true
+    status_freshness: updated
+    status_kinds:
+      Active: '🟢'
+      Stub: '⚪'
+      Runbook: '🛠'
+      CaseStudy: '📋'
+    h1_pattern_by_status:
+      Active: '^# .+ Playbook$'
+      Stub: '^# .+ Playbook$'
+      Runbook: '.+'
+      CaseStudy: '.+'
+    required_sections:
+      by_status:
+        Active:
+          - Overview
+          - Data sources
+          - Procedure
+          - Common patterns
+          - Common dead ends
+        Stub:
+          - Overview
+        Runbook:
+          - Overview
+        CaseStudy:
+          - Overview
+
+# ---- Global checks ----
+
+# Strings that must not appear in any SKILL.md body. Useful for keeping
+# deleted skill names from creeping back as cross-links.
+# Each entry: {string, allowed_in: [<relative-path>, ...]}
+forbidden_body_strings: []
+
+# Hard caps. All have built-in defaults; declare here only to override.
+# Set any cap to 0 to disable the check.
+#
+# - max_skill_md_lines (default 500): past this the harness loader degrades.
+# - max_skill_md_bytes (default 10000): same, by byte count.
+# - max_description_bytes (default 500): cap on frontmatter `description`
+#   length. Descriptions load into every agent session for keyword matching,
+#   so they are pure always-on context cost. 500 fits a canonical-name +
+#   one sentence of trigger phrasings, no padding.
+max_skill_md_lines: 500
+max_skill_md_bytes: 10000
+max_description_bytes: 500
