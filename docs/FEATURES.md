@@ -42,7 +42,7 @@ Replaces the prior `~/.cache/ssm-env.sh` cleartext dump (deleted) and its `scrip
 
 - **Wispr Flow auto-Return** - watches for release of the Flow trigger key (default `fn`), polls `hs.pasteboard.changeCount` for up to 3s, and fires Return once paste lands.
 - **Verify-and-retry** - after firing Return, waits 180ms then does Cmd+A / Cmd+C. If the pasteboard changeCount ticks, the input still has text (Return didn't submit), so Right-arrow to deselect and fire Return again. Up to 2 retries.
-- **Blocklist** - skips VSCode, Terminal, iTerm2, WezTerm, Obsidian, TextEdit, where Return inserts a newline rather than submitting.
+- **Blocklist** - skips terminals and note-taking apps where Return inserts a newline rather than submitting (full list in `hammerspoon/init.lua`).
 
 ## Install surface
 
