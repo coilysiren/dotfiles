@@ -2,6 +2,10 @@
 
 Workspace-level conventions (git workflow, voice, ops boundary) load globally via `~/.claude/CLAUDE.md` -> `coilyco-ai/AGENTS.md`. Nothing repo-specific to override yet; this file exists so the symmetric trifecta (README / AGENTS / docs/FEATURES) is complete and grep-discoverable.
 
+## Skills
+
+`.claude/skills/` ships SKILL.md docs for the configs that live here (`tooling-nushell`, `tooling-wezterm`, `tooling-hammerspoon`, `tooling-gpg-ssm`). Coilyco-ai's `setup.sh` walks this dir as a peer skill source and symlinks each entry into `~/.claude/skills/`. Edit the SKILL.md next to the config it describes, not in coilyco-ai.
+
 ## See also
 
 - [README.md](README.md) - human-facing intro, per-OS install steps.
