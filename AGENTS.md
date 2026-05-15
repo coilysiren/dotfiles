@@ -4,7 +4,7 @@ Workspace-level conventions (git workflow, voice, ops boundary) load globally vi
 
 ## Skills
 
-`.claude/skills/` ships SKILL.md docs for the configs that live here (`tooling-nushell`, `tooling-wezterm`, `tooling-hammerspoon`, `tooling-gpg-ssm`). Coilyco-ai's `setup.sh` walks this dir as a peer skill source and symlinks each entry into `~/.claude/skills/`. Edit the SKILL.md next to the config it describes, not in coilyco-ai.
+`.claude/skills/` ships SKILL.md docs for the configs that live here (`tooling-nushell`, `tooling-wezterm`, `tooling-gpg-ssm`). Coilyco-ai's `setup.sh` walks this dir as a peer skill source and symlinks each entry into `~/.claude/skills/`. Edit the SKILL.md next to the config it describes, not in coilyco-ai.
 
 ## See also
 

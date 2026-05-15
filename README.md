@@ -12,14 +12,13 @@ Cross-platform shell + terminal setup. Same nu config and WezTerm config on Mac,
 - `nu/hosts/{macos,linux,windows}.nu` - per-host PATH and tooling. Picked automatically via `$nu.os-info.name`.
 - `nu/ssm-env.nu` - in-process AWS SSM secret loader. Replaces the old `~/.cache/ssm-env.sh` cleartext dump. Run `ssm-load` when you need secrets in your env. Nothing ever hits disk.
 - `wezterm/wezterm.lua` - terminal config. Single file for all three OSes. Windows entry includes a shell picker (Nushell / Git Bash / PowerShell / cmd).
-- `hammerspoon/init.lua` - Mac-only. Auto-presses Return after Wispr Flow finishes pasting dictated text, with a Cmd+A verify-and-retry pass for the times the first Return doesn't submit.
 - `scripts/` - portable utilities not specific to nu or wezterm.
   - `gpg-doctor.nu` - diagnose gpg signing setup.
   - `verbatim-echo.sh` - wrap a command's output in a fenced block clipped to 20 lines / 100 chars per line. Chat-safe dumps for mobile.
   - `check-aws-config.py` - reject the `[profile default]` trap in `~/.aws/config` that surfaces later as a cryptic `NoRegion` from SSM/S3.
   - `gpg-ssm` / `gpg-ssm.cmd` - GPG signing wrapper that pulls the passphrase from AWS SSM at `/coilysiren/gpg-passphrase/<keyid>` instead of caching it on disk. Wire-up Mac/Linux: `git config --global gpg.program "$HOME/.local/bin/gpg-ssm"`. Wire-up Windows: same but point at `gpg-ssm.cmd`, a bash.exe shim Git for Windows needs because it can't invoke extensionless shebang scripts reliably.
   - `check-commit-closes-issue.py` - commit-msg hook rejecting commits that lack a same-repo `closes #N` / `fixes #N` / `resolves #N`.
-- `.claude/skills/` - SKILL.md docs for the configs that live here. `tooling-nushell`, `tooling-wezterm`, `tooling-hammerspoon`, `tooling-gpg-ssm`. Coilyco-ai's `setup.sh` walks this dir as a peer skill source, symlinking each entry into `~/.claude/skills/`. Co-located with the configs they describe so they don't drift.
+- `.claude/skills/` - SKILL.md docs for the configs that live here. `tooling-nushell`, `tooling-wezterm`, `tooling-gpg-ssm`. Coilyco-ai's `setup.sh` walks this dir as a peer skill source, symlinking each entry into `~/.claude/skills/`. Co-located with the configs they describe so they don't drift.
 
 ## Install
 
@@ -34,8 +33,6 @@ ln -sf "$PWD/nu/config.nu" "$NU_CONFIG/config.nu"
 ln -sf "$PWD/nu/ssm-env.nu" "$NU_CONFIG/ssm-env.nu"
 ln -sf "$PWD/nu/hosts" "$NU_CONFIG/hosts"
 ln -sf "$PWD/wezterm/wezterm.lua" ~/.wezterm.lua
-mkdir -p ~/.hammerspoon
-ln -sf "$PWD/hammerspoon/init.lua" ~/.hammerspoon/init.lua
 mkdir -p ~/.local/bin
 ln -sf "$PWD/scripts/gpg-ssm" ~/.local/bin/gpg-ssm
 ```
