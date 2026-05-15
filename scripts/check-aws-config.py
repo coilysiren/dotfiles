@@ -14,7 +14,7 @@ it finds a `[profile default]` section, printing the remediation.
 
 Run via `make check-aws-config` or `coily exec check-aws-config`.
 
-Origin: coilysiren/coilyco-ai#416.
+Origin: coilysiren/agentic-os-kai#416.
 """
 
 from __future__ import annotations
@@ -72,7 +72,7 @@ def main() -> int:
     for k, v in merged.items():
         print(f"  {k} = {v}")
     print()
-    print("Background: coilysiren/coilyco-ai#416.")
+    print("Background: coilysiren/agentic-os-kai#416.")
     return 1
 
 

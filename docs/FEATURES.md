@@ -46,7 +46,7 @@ Replaces the prior `~/.cache/ssm-env.sh` cleartext dump (deleted) and its `scrip
 
 ## Portable utility scripts
 
-Generic-purpose scripts pulled out of `coilyco-ai/scripts/` because they have no Kai-specific path coupling. Originals still live in coilyco-ai for now to keep its setup.sh and commit-hook rollout working.
+Generic-purpose scripts pulled out of `agentic-os-kai/scripts/` because they have no Kai-specific path coupling. Originals still live in agentic-os-kai for now to keep its setup.sh and commit-hook rollout working.
 
 - **[scripts/verbatim-echo.sh](../scripts/verbatim-echo.sh)** - run a command and emit its output wrapped in a fenced code block, clipped to 20 lines / 100 chars per line. Used by the `$$ <cmd>` chat convention so mobile chat sees command output without blowing the context window.
 - **[scripts/check-aws-config.py](../scripts/check-aws-config.py)** - lint `~/.aws/config` for the `[profile default]` trap. AWS SDKs read `[default]`, never `[profile default]`, so a `region =` placed under the latter is unreachable and surfaces later as a cryptic `NoRegion` from SSM/S3. STS-only preflights hide the bug.

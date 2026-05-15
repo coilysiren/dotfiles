@@ -49,7 +49,7 @@ If a Windows host suddenly can't find the SSM param, suspect this got reverted b
 1. Generate a fresh GPG keypair on the host (`gpg --full-generate-key`, ed25519 or rsa4096).
 2. Set the local `user.signingkey` to the new keyid: `git config --global user.signingkey <KEYID>`.
 3. Stash the passphrase: `coily ops aws ssm put-parameter --name /coilysiren/gpg-passphrase/<KEYID> --type SecureString --value FILL_ME_IN`.
-4. Update `SSM.md` in `coilyco-ai/` with the new param row.
+4. Update `SSM.md` in `agentic-os-kai/` with the new param row.
 5. Export the public key, upload to GitHub (`Settings -> SSH and GPG keys`).
 6. Test: `echo test | gpg --clearsign` should round-trip through the wrapper.
 
@@ -63,11 +63,11 @@ If a Windows host suddenly can't find the SSM param, suspect this got reverted b
 
 ## Never bypass
 
-The temptation is real: "I'm in a hurry, let me just `git commit --no-gpg-sign`" or `git config --global commit.gpgsign false` for a session. Don't. Signed commits are a coilyco-ai pre-commit hook expectation across repos. If `gpg-ssm` is genuinely broken, fix it (or temporarily comment out the `gpg.program` line and remember to put it back). Bypassing leaves unsigned commits in history that look identical to spoofed ones.
+The temptation is real: "I'm in a hurry, let me just `git commit --no-gpg-sign`" or `git config --global commit.gpgsign false` for a session. Don't. Signed commits are a agentic-os-kai pre-commit hook expectation across repos. If `gpg-ssm` is genuinely broken, fix it (or temporarily comment out the `gpg.program` line and remember to put it back). Bypassing leaves unsigned commits in history that look identical to spoofed ones.
 
 ## See also
 
 - Canonical script: `~/projects/coilysiren/agentic-os/scripts/gpg-ssm`
 - Windows shim: `~/projects/coilysiren/agentic-os/scripts/gpg-ssm.cmd`
 - Install snippets per OS: `~/projects/coilysiren/agentic-os/README.md`
-- SSM param inventory: `~/projects/coilysiren/coilyco-ai/SSM.md`
+- SSM param inventory: `~/projects/coilysiren/agentic-os-kai/SSM.md`
