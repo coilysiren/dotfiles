@@ -1,6 +1,6 @@
 ---
 name: tooling-nushell
-description: Nushell is Kai's default shell on every host. Syntax is not bash/zsh-compatible. Use when drafting shell commands, editing dotfiles/nu/*, configuring PATH or prompt, loading AWS secrets via ssm-load, or debugging unfamiliar nu errors. Triggers - nushell, nu, $env.VAR, $nu.os-info, structured pipeline, let, def, ssm-load, ssm-env, env.nu, config.nu, hosts/macos.nu, PROMPT_COMMAND, chsh nu.
+description: Nushell is Kai's default shell on every host. Syntax is not bash/zsh-compatible. Use when drafting shell commands, editing agentic-os/nu/*, configuring PATH or prompt, loading AWS secrets via ssm-load, or debugging unfamiliar nu errors. Triggers - nushell, nu, $env.VAR, $nu.os-info, structured pipeline, let, def, ssm-load, ssm-env, env.nu, config.nu, hosts/macos.nu, PROMPT_COMMAND, chsh nu.
 ---
 
 # Nushell
@@ -9,9 +9,9 @@ Kai's shell on every host. Drafted commands should be Nushell unless she asks fo
 
 ## Config location
 
-Canonical files live at `~/projects/coilysiren/dotfiles/nu/`, symlinked into Nushell's config dir per OS:
+Canonical files live at `~/projects/coilysiren/agentic-os/nu/`, symlinked into Nushell's config dir per OS:
 
-- **Mac** - `~/Library/Application Support/nushell/` (not `~/.config/nushell/`). AGENTS.md gets this wrong - check the dotfiles README for the install snippet, never re-derive.
+- **Mac** - `~/Library/Application Support/nushell/` (not `~/.config/nushell/`). AGENTS.md gets this wrong - check the agentic-os README for the install snippet, never re-derive.
 - **Linux** - `~/.config/nushell/`.
 - **Windows** - `%APPDATA%\nushell\`.
 
@@ -60,7 +60,7 @@ Two-line prompt defined in `config.nu`. Line 1: `🕐 HH:MM:SS  🧜 user@host  
 
 ## Login shell
 
-`chsh -s "$(nu | path expand)"` after adding to `/etc/shells`. On Mac the install snippet in the dotfiles README is authoritative. On Linux (kai-server) Nushell is invoked bare by WezTerm; not setting it as login shell is also fine.
+`chsh -s "$(nu | path expand)"` after adding to `/etc/shells`. On Mac the install snippet in the agentic-os README is authoritative. On Linux (kai-server) Nushell is invoked bare by WezTerm; not setting it as login shell is also fine.
 
 ## When to drop to bash
 
@@ -81,6 +81,6 @@ For everything else, draft in Nushell.
 
 ## See also
 
-- Canonical configs: `~/projects/coilysiren/dotfiles/nu/`
-- Install snippets per OS: `~/projects/coilysiren/dotfiles/README.md`
+- Canonical configs: `~/projects/coilysiren/agentic-os/nu/`
+- Install snippets per OS: `~/projects/coilysiren/agentic-os/README.md`
 - Terminal that runs Nushell: [`tooling-wezterm`](../tooling-wezterm/SKILL.md)

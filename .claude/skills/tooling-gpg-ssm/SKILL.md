@@ -9,8 +9,8 @@ GPG wrapper script that fetches the signing-key passphrase from AWS SSM at sign 
 
 ## Files
 
-- `~/projects/coilysiren/dotfiles/scripts/gpg-ssm` - the wrapper (bash). Symlinked to `~/.local/bin/gpg-ssm`.
-- `~/projects/coilysiren/dotfiles/scripts/gpg-ssm.cmd` - Windows shim for Git for Windows, which can't reliably invoke an extensionless shebang script. It's a `bash.exe` re-entry.
+- `~/projects/coilysiren/agentic-os/scripts/gpg-ssm` - the wrapper (bash). Symlinked to `~/.local/bin/gpg-ssm`.
+- `~/projects/coilysiren/agentic-os/scripts/gpg-ssm.cmd` - Windows shim for Git for Windows, which can't reliably invoke an extensionless shebang script. It's a `bash.exe` re-entry.
 
 ## Wire-up
 
@@ -67,7 +67,7 @@ The temptation is real: "I'm in a hurry, let me just `git commit --no-gpg-sign`"
 
 ## See also
 
-- Canonical script: `~/projects/coilysiren/dotfiles/scripts/gpg-ssm`
-- Windows shim: `~/projects/coilysiren/dotfiles/scripts/gpg-ssm.cmd`
-- Install snippets per OS: `~/projects/coilysiren/dotfiles/README.md`
+- Canonical script: `~/projects/coilysiren/agentic-os/scripts/gpg-ssm`
+- Windows shim: `~/projects/coilysiren/agentic-os/scripts/gpg-ssm.cmd`
+- Install snippets per OS: `~/projects/coilysiren/agentic-os/README.md`
 - SSM param inventory: `~/projects/coilysiren/coilyco-ai/SSM.md`

@@ -9,12 +9,12 @@ Kai's terminal on every host. One config file, three OSes.
 
 ## Config location
 
-Canonical file: `~/projects/coilysiren/dotfiles/wezterm/wezterm.lua`. Symlinked to:
+Canonical file: `~/projects/coilysiren/agentic-os/wezterm/wezterm.lua`. Symlinked to:
 
 - **Mac/Linux** - `~/.wezterm.lua`
 - **Windows** - `%USERPROFILE%\.wezterm.lua`
 
-Fonts ship in-repo at `dotfiles/wezterm/fonts/` (Monaspace variable TTFs). Wallpaper at `dotfiles/static/wallpaper.jpg`. Both paths resolve via `wezterm.home_dir` plus the host-specific prefix (`/projects/coilysiren/dotfiles` on Mac/Linux, `\projects-x\coilysiren\dotfiles` on Windows).
+Fonts ship in-repo at `wezterm/fonts/` (Monaspace variable TTFs). Wallpaper at `static/wallpaper.jpg`. Both paths resolve via `wezterm.home_dir` plus the host-specific prefix (`/projects/coilysiren/agentic-os` on Mac/Linux, `\projects-x\coilysiren\agentic-os` on Windows).
 
 ## Platform branching
 
@@ -38,7 +38,7 @@ Wired via `config.font` + `config.font_rules`. Size 13.0.
 
 **Critical gotcha** - `config.font_dirs = { fonts_dir() }` is **additive**. Never set `font_locator = 'ConfigDirsOnly'` - that breaks system-font fallback for emoji and missing glyphs. Comment in the file already says this, don't undo it.
 
-If a glyph renders as tofu, fix is almost always one of: missing TTF in `dotfiles/wezterm/fonts/`, broken symlink, or someone (you) set `font_locator`. Check those before suspecting WezTerm.
+If a glyph renders as tofu, fix is almost always one of: missing TTF in `wezterm/fonts/`, broken symlink, or someone (you) set `font_locator`. Check those before suspecting WezTerm.
 
 ## Color scheme
 
@@ -81,8 +81,8 @@ WezTerm auto-reloads `wezterm.lua` on save. Errors surface in the WezTerm debug 
 
 ## See also
 
-- Canonical config: `~/projects/coilysiren/dotfiles/wezterm/wezterm.lua`
-- Fonts: `~/projects/coilysiren/dotfiles/wezterm/fonts/`
-- Install snippets: `~/projects/coilysiren/dotfiles/README.md`
+- Canonical config: `~/projects/coilysiren/agentic-os/wezterm/wezterm.lua`
+- Fonts: `~/projects/coilysiren/agentic-os/wezterm/fonts/`
+- Install snippets: `~/projects/coilysiren/agentic-os/README.md`
 - Shell that runs inside it: [`tooling-nushell`](../tooling-nushell/SKILL.md)
 - Mac fullscreen-Space behavior origin: `gui-startup` handler at the top of `wezterm.lua`

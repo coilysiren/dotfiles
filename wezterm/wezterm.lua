@@ -23,12 +23,12 @@ config.color_scheme = 'Tokyo Night'
 
 -- Cross-platform fonts: load the Monaspace variable TTFs out of this repo
 -- instead of relying on a system font install. Same config works on Mac,
--- Linux, and Windows as long as the dotfiles checkout is reachable.
+-- Linux, and Windows as long as the agentic-os checkout is reachable.
 local function fonts_dir()
   if wezterm.target_triple:find('windows') then
-    return wezterm.home_dir .. '\\projects-x\\coilysiren\\dotfiles\\wezterm\\fonts'
+    return wezterm.home_dir .. '\\projects-x\\coilysiren\\agentic-os\\wezterm\\fonts'
   end
-  return wezterm.home_dir .. '/projects/coilysiren/dotfiles/wezterm/fonts'
+  return wezterm.home_dir .. '/projects/coilysiren/agentic-os/wezterm/fonts'
 end
 -- font_dirs is additive: WezTerm still falls back to system fonts for emoji,
 -- glyph fallback, etc. Don't set font_locator = 'ConfigDirsOnly' or that breaks.
@@ -62,16 +62,16 @@ else
 end
 
 -- Background: Sombra hacking skull (Overwatch, 2016 ARG era).
--- Image lives in the dotfiles repo so it's the same across hosts.
-local function dotfiles_dir()
+-- Image lives in the agentic-os repo so it's the same across hosts.
+local function repo_dir()
   if wezterm.target_triple:find('windows') then
-    return wezterm.home_dir .. '\\projects-x\\coilysiren\\dotfiles'
+    return wezterm.home_dir .. '\\projects-x\\coilysiren\\agentic-os'
   end
-  return wezterm.home_dir .. '/projects/coilysiren/dotfiles'
+  return wezterm.home_dir .. '/projects/coilysiren/agentic-os'
 end
 config.background = {
   {
-    source = { File = dotfiles_dir() .. '/static/wallpaper.jpg' },
+    source = { File = repo_dir() .. '/static/wallpaper.jpg' },
     hsb = { brightness = 0.08, saturation = 0.7 },
     width = 'Cover',
     height = 'Cover',

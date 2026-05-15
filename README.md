@@ -1,4 +1,6 @@
-# dotfiles
+# agentic-os
+
+(Formerly `coilysiren/dotfiles`. Renamed 2026-05-15 as the repo grows into broader personal-OS / agentic-OS scope beyond just shell + terminal config.)
 
 ![Sombra hacking skull](static/wallpaper.jpg)
 

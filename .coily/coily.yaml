@@ -12,7 +12,7 @@ catalog:
   system: ops
   owner: kai
   lifecycle: production
-  description: "Personal dotfiles, shell config, GPG/SSM tooling, and shared utility scripts symlinked into sibling coilysiren/* repos."
+  description: "Personal agentic OS: shell config, terminal config, GPG/SSM tooling, Claude skills, and shared utility scripts symlinked into sibling coilysiren/* repos. Growing beyond just dotfiles into broader personal-OS scope."
   dependsOn: []
   providesApis:
     - shared-scripts

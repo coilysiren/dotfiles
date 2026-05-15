@@ -9,7 +9,7 @@ Mac-only Lua scripting bridge for OS-level automation. Kai uses it for one job t
 
 ## Config location
 
-Canonical file: `~/projects/coilysiren/dotfiles/hammerspoon/init.lua`. Symlinked to `~/.hammerspoon/init.lua` by the dotfiles install steps.
+Canonical file: `~/projects/coilysiren/agentic-os/hammerspoon/init.lua`. Symlinked to `~/.hammerspoon/init.lua` by the agentic-os install steps.
 
 Not cross-platform. Hammerspoon does not exist on Windows or Linux - the Wispr Flow auto-Return functionality has no equivalent on those hosts.
 
@@ -71,6 +71,6 @@ Hammerspoon is the right reach for: OS-level event taps, accessibility-API hacks
 
 ## See also
 
-- Canonical config: `~/projects/coilysiren/dotfiles/hammerspoon/init.lua`
-- Install: `~/projects/coilysiren/dotfiles/README.md` (the Mac section's `ln -sf $PWD/hammerspoon/init.lua ~/.hammerspoon/init.lua`)
+- Canonical config: `~/projects/coilysiren/agentic-os/hammerspoon/init.lua`
+- Install: `~/projects/coilysiren/agentic-os/README.md` (the Mac section's `ln -sf $PWD/hammerspoon/init.lua ~/.hammerspoon/init.lua`)
 - Hammerspoon docs: https://www.hammerspoon.org/docs/
