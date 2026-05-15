@@ -1,0 +1,25 @@
+# Top-level zsh entry. Sourced via a symlink at $HOME/.zshrc per host.
+#
+# Layout mirrors the old nu/ tree:
+#   env.zsh            - env vars, sourced first
+#   hosts/<os>.zsh     - per-OS PATH and tooling
+#   config.zsh         - aliases, functions, prompt
+#   ssm-env.zsh        - in-process AWS SSM secret loader
+#
+# Install (Mac/Linux):  ln -sf ~/projects/coilysiren/agentic-os/zsh/zshrc ~/.zshrc
+# Install (Windows):    use Git Bash; agentic-os lives at /x/projects-x/coilysiren/agentic-os.
+
+_zsh_dir="${${(%):-%N}:A:h}"
+
+source "$_zsh_dir/env.zsh"
+
+case "$(uname -s)" in
+  Darwin)        source "$_zsh_dir/hosts/macos.zsh" ;;
+  Linux)         source "$_zsh_dir/hosts/linux.zsh" ;;
+  MINGW*|MSYS*)  source "$_zsh_dir/hosts/windows.zsh" ;;
+esac
+
+source "$_zsh_dir/config.zsh"
+source "$_zsh_dir/ssm-env.zsh"
+
+unset _zsh_dir

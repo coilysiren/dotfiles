@@ -4,10 +4,15 @@
 
 ![Sombra hacking skull](static/wallpaper.jpg)
 
-Cross-platform shell + terminal setup. Same nu config and WezTerm config on Mac, Linux, and Windows.
+Cross-platform shell + terminal setup. Zsh on Mac, Linux, and Windows. (Nushell+WezTerm migration was rolled back; those trees are scheduled for deletion - see coilysiren/agentic-os#48.)
 
 ## Layout
 
+- `zsh/zshrc` - top-level entry, symlinked to `~/.zshrc`. Sources `env.zsh`, picks the right `hosts/<os>.zsh`, then `config.zsh` and `ssm-env.zsh`.
+- `zsh/env.zsh` - history, identity, editor, AWS defaults, `COILY_LOCKDOWN_ROOT`.
+- `zsh/hosts/{macos,linux,windows}.zsh` - per-host PATH and tooling. Picked automatically via `uname -s`.
+- `zsh/config.zsh` - aliases, git helpers, `rg` wrapper, prompt (two-line siren motif).
+- `zsh/ssm-env.zsh` - in-process AWS SSM secret loader. `ssm-load` reads `/coilysiren/*` into the current shell env. Never disk.
 - `nu/env.nu`, `nu/config.nu` - entry points sourced by nushell at startup. `env.nu` runs first, sets env and PATH, sources the right host file.
 - `nu/hosts/{macos,linux,windows}.nu` - per-host PATH and tooling. Picked automatically via `$nu.os-info.name`.
 - `nu/ssm-env.nu` - in-process AWS SSM secret loader. Replaces the old `~/.cache/ssm-env.sh` cleartext dump. Run `ssm-load` when you need secrets in your env. Nothing ever hits disk.
@@ -22,7 +27,34 @@ Cross-platform shell + terminal setup. Same nu config and WezTerm config on Mac,
 
 ## Install
 
-### Mac
+### Mac (zsh)
+
+```bash
+ln -sf "$PWD/zsh/zshrc" ~/.zshrc
+```
+
+Login shell already defaults to `/bin/zsh` on a fresh Mac. If a previous nu chsh was applied:
+
+```bash
+chsh -s /bin/zsh
+```
+
+### Linux (zsh, kai-server)
+
+```bash
+ln -sf "$PWD/zsh/zshrc" ~/.zshrc
+chsh -s /bin/zsh  # or wherever zsh lives on the host
+```
+
+### Windows (zsh, Git Bash)
+
+Git Bash on Windows runs zsh if installed via `pacman -S zsh` inside the MSYS env. Symlink target uses POSIX paths (Git Bash translates):
+
+```bash
+ln -sf "$PWD/zsh/zshrc" ~/.zshrc
+```
+
+### Mac (legacy nu, deprecated)
 
 ```bash
 brew install nushell wezterm
