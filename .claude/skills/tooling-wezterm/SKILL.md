@@ -1,11 +1,11 @@
 ---
 name: tooling-wezterm
-description: WezTerm is Kai's terminal on every host. Single cross-platform wezterm.lua. Use when editing terminal config, debugging fonts, changing color scheme, tweaking the launcher menu, adding key bindings, or shipping a change that must work on all three OSes. Triggers - wezterm, wezterm.lua, terminal config, font_dirs, Monaspace, Neon, Radon, Xenon, Krypton, Tokyo Night, native_macos_fullscreen, launch_menu, default_prog, target_triple.
+description: WezTerm is the terminal on every host. Single cross-platform wezterm.lua. Use when editing terminal config, debugging fonts, changing color scheme, tweaking the launcher menu, adding key bindings, or shipping a change that must work on all three OSes. Triggers - wezterm, wezterm.lua, terminal config, font_dirs, Monaspace, Neon, Radon, Xenon, Krypton, Tokyo Night, native_macos_fullscreen, launch_menu, default_prog, target_triple.
 ---
 
 # WezTerm
 
-Kai's terminal on every host. One config file, three OSes.
+The terminal on every host. One config file, three OSes.
 
 ## Config location
 
@@ -64,7 +64,7 @@ Minimal set in `config.keys`:
 
 ## Reloading
 
-WezTerm auto-reloads `wezterm.lua` on save. Errors surface in the WezTerm debug overlay (`Ctrl+Shift+L`) - check there if a config change doesn't seem to take. Syntax errors keep the previous config running, so a broken save doesn't lock Kai out.
+WezTerm auto-reloads `wezterm.lua` on save. Errors surface in the WezTerm debug overlay (`Ctrl+Shift+L`) - check there if a config change doesn't seem to take. Syntax errors keep the previous config running, so a broken save doesn't lock the user out.
 
 ## Common edits
 

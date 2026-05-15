@@ -1,11 +1,11 @@
 ---
 name: tooling-nushell
-description: Nushell is Kai's default shell on every host. Syntax is not bash/zsh-compatible. Use when drafting shell commands, editing agentic-os/nu/*, configuring PATH or prompt, loading AWS secrets via ssm-load, or debugging unfamiliar nu errors. Triggers - nushell, nu, $env.VAR, $nu.os-info, structured pipeline, let, def, ssm-load, ssm-env, env.nu, config.nu, hosts/macos.nu, PROMPT_COMMAND, chsh nu.
+description: Nushell is the user's default shell on every host. Syntax is not bash/zsh-compatible. Use when drafting shell commands, editing agentic-os/nu/*, configuring PATH or prompt, loading AWS secrets via ssm-load, or debugging unfamiliar nu errors. Triggers - nushell, nu, $env.VAR, $nu.os-info, structured pipeline, let, def, ssm-load, ssm-env, env.nu, config.nu, hosts/macos.nu, PROMPT_COMMAND, chsh nu.
 ---
 
 # Nushell
 
-Kai's shell on every host. Drafted commands should be Nushell unless she asks for bash.
+the user's shell on every host. Drafted commands should be Nushell unless asked otherwise.
 
 ## Config location
 
@@ -60,7 +60,7 @@ Two-line prompt defined in `config.nu`. Line 1: `🕐 HH:MM:SS  🧜 user@host  
 
 ## Login shell
 
-`chsh -s "$(nu | path expand)"` after adding to `/etc/shells`. On Mac the install snippet in the agentic-os README is authoritative. On Linux (kai-server) Nushell is invoked bare by WezTerm; not setting it as login shell is also fine.
+`chsh -s "$(nu | path expand)"` after adding to `/etc/shells`. On Mac the install snippet in the agentic-os README is authoritative. On Linux Nushell is invoked bare by WezTerm; not setting it as login shell is also fine.
 
 ## When to drop to bash
 

@@ -1,0 +1,92 @@
+---
+name: tooling-skill-authoring
+description: Author, modify, and validate Claude Code skills. Covers skill location, naming/category prefixes, alias-packing in descriptions, encode-the-why discipline, flat-not-nested layout, Python-helpers bias, and plugin marketplace fast-forward. Use whenever the user wants to make a new skill, turn an in-session workflow into a reusable skill, or codify a pattern. Triggers - skill, SKILL.md, frontmatter, plugin, .claude/skills, authoring skill, skill description, alias, validator, handbook, categories.yaml, skill template.
+---
+
+# Skill authoring
+
+## Handbook
+
+Structural rules (categories, frontmatter, status lines, required sections, validators, templates) live in [`references/handbook.md`](references/handbook.md). Authoring walkthrough in [`references/authoring-walkthrough.md`](references/authoring-walkthrough.md). Templates per category in [`templates/`](templates/).
+
+The rest of this file carries opinionated authoring discipline the handbook doesn't cover: why-encoding, flat-not-nested layout, Python-helpers bias, plugin marketplace fast-forward.
+
+## Location
+
+**Default: skills live at `<personal-os-repo>/.claude/skills/`.** Canonical source for the cross-repo / runbook / operating-context skill surface. Global-scope copy at `~/.claude/skills/<name>` is a symlink managed by `./setup.sh`.
+
+**Exception: per-repo co-location for pure design-reference skills.** A repo may host its own `.claude/skills/` if the skills are pure design or usage reference for *that repo only* and never get invoked under cross-repo failure conditions. Per-repo skills surface only when Claude Code is operating in that repo's directory, which is the correct scope for design references. Runbooks, investigation playbooks, and anything that fires under partial-failure stay central (see "Investigation skills live centrally").
+
+When co-locating, the host repo must:
+
+1. Subscribe to [`coilysiren/claude-skill-discipline`](https://github.com/coilysiren/claude-skill-discipline) in its `.pre-commit-config.yaml`. Pin to a tag. That repo ships the structural validator, cross-link checker, and commit-msg gate.
+2. Ship a slim `.claude/skills/categories.yaml` at the skills root with only the categories the repo actually uses. The upstream validator reads this path directly.
+3. Run `pre-commit install` in the host repo. That activates the hooks for every commit.
+
+No `setup.sh` is required in the host repo. Claude Code auto-discovers skills under any `.claude/skills/` in the working tree.
+
+## Authoring
+
+Directory under `.claude/skills/` with `SKILL.md` (frontmatter: `name`, `description` + instructions). Commit in the personal-OS repo, rerun `./setup.sh` from repo root (idempotent symlink refresh).
+
+Bootstrap also handles client CLAUDE.md import, workspace CLAUDE.md import, parent-dir AGENTS.md symlink. Uses `ln -s`; on Windows needs `MSYS=winsymlinks:nativestrict` + Developer Mode.
+
+Run the validator before committing for fast feedback:
+
+```sh
+pre-commit run skill-conventions --all-files
+pre-commit run dead-cross-links --all-files
+pre-commit run em-dash-check --all-files
+```
+
+The structural validator enforces the category taxonomy from `.claude/skills/categories.yaml`. If your skill name doesn't match an allowed prefix or exact-name, the validator rejects it. See the handbook for the prefix list.
+
+## Encode the why, not just the what
+
+Skills exist because every agent session starts from zero. There is no Sarah to ask why a rule was written, so undocumented reasoning gets re-derived badly on each fresh context, or the rule gets deleted by an agent who cannot see why it mattered. Each rule below captures decision reasoning, not just procedure. Hold that line for new sections.
+
+Shape: lead with the rule, then a **Why:** line (incident, constraint, prior failure mode that produced it), then a **How to apply:** line (when the rule fires). Date-stamp the flag where useful (e.g. "Flagged 2026-04-26") so a future read can judge whether the why is still load-bearing.
+
+Framing reference: https://simme.dev/posts/the-end-of-just-ask-sarah/.
+
+## Skills are flat, not nested
+
+Every skill is a peer directory directly under `.claude/skills/`. Do **not** nest sub-skills inside another skill's directory (e.g. `meta-skill/sub-skill/SKILL.md`). Nested-skill discovery is poorly supported by the harness, and `setup.sh` only symlinks top-level skill dirs to `~/.claude/skills/<name>`. Anything below the top level is invisible to the loader.
+
+When a meta-skill needs to route to other skills, the routed skills live as **flat peers** alongside it. The meta's job is to name them and describe when each fires; the loader handles each one independently.
+
+**Why:** caught early while building a meta-skill router. Initial design assumed sub-dir nesting per a team-coordination plugin pattern. That pattern relied on team-coordination plumbing (separate plugin repo, `commands/` symlinks, etc.) that doesn't apply in a single-operator personal-OS repo. Flat is the only shape the existing setup actually supports.
+
+**How to apply:** when authoring a meta-skill, the routing table lists peer-skill names, not paths into the meta's own dir. New routed skills get their own top-level directory. If you find yourself wanting to nest, that's a signal the meta should instead be a thin SKILL.md that describes shared discipline, with the actual work split across peer skills.
+
+## Investigation skills live centrally, not co-located with the tool
+
+Investigation / runbook-shaped skills go under the personal-OS repo's `.claude/skills/`, even when the tool they investigate lives in a different repo. A routed ops-investigation meta-skill with peer skills per failure-domain is the canonical shape.
+
+**Why:** real failures cross component boundaries. A single command can fail in a way that implicates several services and hosts at once. An investigator under pressure should not have to clone three repos to find the right runbook. The runbook-monorepo pattern is well-established in SRE practice (Google SRE book, [sre.google/sre-book/](https://sre.google/sre-book/), chapter "Being On-Call"), and downstream tooling (Backstage, incident.io, FireHydrant, OpenTelemetry) all use the same emit-locally / investigate-centrally split. Co-locating optimizes for the runbook *author*; centralizing optimizes for the runbook *consumer*, who is always the one operating under partial-failure conditions.
+
+**How to apply:** when a new skill is shaped like a runbook (anti-signals, case library, version-pin discipline, "what to check when X breaks"), it lives here regardless of which repo X is in. Co-location is appropriate only for skills that are pure tool-usage reference and never get invoked under failure.
+
+## Bias toward Python helpers, not pure-prompt skills
+
+When a skill parses files, walks directories, queries SQLite, or does any structured data manipulation, write a Python script in the skill directory and have SKILL.md call it. Pure prompt instructions are fine for narrative steps; Python is right for anything where determinism, speed, or testability matter.
+
+Helpers go in the skill dir alongside SKILL.md, get committed to the personal-OS repo, run with the system `python3` (stdlib-first; reach for trafilatura, lxml, etc. only when stdlib genuinely doesn't suffice).
+
+Flagged 2026-04-26.
+
+**Why:** procedure-as-prompt loses fidelity each time the LLM re-derives boilerplate (date math, path globbing, file IO). Committed Python is auditable, fast, and the same on every host. The LLM tier should focus on synthesis, not parsing.
+
+**How to apply:** new skill that ingests data → start with `script.py` (or named subcommands), have SKILL.md document inputs/outputs/invocation. Existing skill that's been doing parsing in-prompt → migrate to Python on next touch.
+
+## Frontmatter aliases
+
+Users forget exact skill names. The `description` field is **keyword-matched for triggering**, so pack aliases liberally into it. Lead with the canonical name + 5-10 synonyms or natural-language phrasings users might reach for. Don't be terse about this; the aliases are the discoverability surface.
+
+## Plugin marketplace installs (gauntlet etc.)
+
+When editing a plugin's source repo (e.g. a sibling clone), also fast-forward the active marketplace clone at `~/.claude/plugins/marketplaces/<plugin>/` after pushing. Plugin work feels agile this way - same-session edit and use, no waiting for the plugin manager's next refresh.
+
+Push source first, then `git -C ~/.claude/plugins/marketplaces/<plugin> pull --ff-only`.
+
+Only safe for plugins you own (origin in your own namespace); third-party marketplace clones stay hands-off.
