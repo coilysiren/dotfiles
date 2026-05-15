@@ -58,19 +58,38 @@ mkdir -p ~/.local/bin
 ln -sf "$PWD/scripts/gpg-ssm" ~/.local/bin/gpg-ssm
 ```
 
-### Windows (Git Bash)
+### Windows (PowerShell)
 
-```bash
-winget install Nushell.Nushell wez.wezterm-nightly
-mkdir -p "$APPDATA/nushell"
-cp nu/env.nu nu/config.nu nu/ssm-env.nu "$APPDATA/nushell/"
-cp -r nu/hosts "$APPDATA/nushell/"
-cp wezterm/wezterm.lua "$USERPROFILE/.wezterm.lua"
-mkdir -p ~/.local/bin
-cp scripts/gpg-ssm scripts/gpg-ssm.cmd ~/.local/bin/
+Run from inside the agentic-os clone.
+
+```powershell
+winget install Nushell.Nushell wez.wezterm.nightly --accept-source-agreements --accept-package-agreements
+
+$src = $PWD
+$nu = "$env:APPDATA\nushell"
+New-Item -ItemType Directory -Path $nu, "$env:USERPROFILE\.local\bin" -Force | Out-Null
+
+# nu config
+foreach ($f in 'env.nu','config.nu','ssm-env.nu') {
+    if (Test-Path "$nu\$f") { Remove-Item "$nu\$f" -Force }
+    New-Item -ItemType SymbolicLink -Path "$nu\$f" -Target "$src\nu\$f" | Out-Null
+}
+if (Test-Path "$nu\hosts") { Remove-Item "$nu\hosts" -Recurse -Force }
+New-Item -ItemType SymbolicLink -Path "$nu\hosts" -Target "$src\nu\hosts" | Out-Null
+
+# wezterm
+if (Test-Path "$env:USERPROFILE\.wezterm.lua") { Remove-Item "$env:USERPROFILE\.wezterm.lua" -Force }
+New-Item -ItemType SymbolicLink -Path "$env:USERPROFILE\.wezterm.lua" -Target "$src\wezterm\wezterm.lua" | Out-Null
+
+# gpg-ssm (Git for Windows needs the .cmd shim because it cannot invoke extensionless shebang scripts reliably)
+foreach ($f in 'gpg-ssm','gpg-ssm.cmd') {
+    $p = "$env:USERPROFILE\.local\bin\$f"
+    if (Test-Path $p) { Remove-Item $p -Force }
+    New-Item -ItemType SymbolicLink -Path $p -Target "$src\scripts\$f" | Out-Null
+}
 ```
 
-(Windows symlinks need admin or developer mode, so copy is simpler. Re-run after edits.)
+(Symlinks need either an elevated PowerShell or Settings -> Privacy and Security -> For developers -> Developer Mode toggled on. Once linked, edits in the repo flow through to nushell, wezterm, and gpg-ssm on next launch, no re-run.)
 
 ## Secrets pattern
 
