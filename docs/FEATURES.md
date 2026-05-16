@@ -1,15 +1,13 @@
 # Features
 
-Baseline inventory of what `agentic-os` ships today. Use this as the reference point for scope changes. When a feature is added, removed, or materially reshaped, update the relevant section so the diff against this file shows scope drift over time.
-
-Last full sweep: 2026-05-13.
+Baseline of what `agentic-os` ships today. Update when a feature is added, removed, or materially reshaped.
 
 ## Nushell config
 
 Cross-platform nu startup files, symlinked into the OS-specific nu config dir at install time.
 
 - **[nu/env.nu](../nu/env.nu)** - sourced first at startup. Sets `LANG`, `EDITOR`, `GIT_EDITOR`, `SSH_KEY_PATH`, `CLI_MFA`, `AWS_PROFILE`, `AWS_REGION`, `AWS_PAGER`, `COILY_LOCKDOWN_ROOT`. Then sources the matching host file.
-- **[nu/config.nu](../nu/config.nu)** - aliases (`del`, `..`, `gt`, `gush`), a wrapped `rg` with hidden-file globs, ported git helpers (`git-default-branch`, `git-pr-title`, `git-merge-default-branch`, `git-checkpoint`, `git-squash`, `gt-conflicts`), Docker helper (`docker-bash`), `pull-all-repos`, `count-lines`, `github-token-load`. Imports `ssm-env.nu`.
+- **[nu/config.nu](../nu/config.nu)** - aliases, a wrapped `rg` with hidden-file globs, ported git helpers (`git-default-branch`, `git-pr-title`, `git-merge-default-branch`, `git-checkpoint`, `git-squash`), `docker-bash`, `pull-all-repos`, `github-token-load`. Imports `ssm-env.nu`.
 - **[nu/hosts/macos.nu](../nu/hosts/macos.nu)** - Mac PATH (homebrew, cargo, ruby, openjdk, gradle, dotnet, fabro), `JAVA_HOME`, `NODE_EXTRA_CA_CERTS` for the local Caddy root.
 - **[nu/hosts/linux.nu](../nu/hosts/linux.nu)** - Linux PATH (linuxbrew, cargo, local bins). Designed for kai-server.
 - **[nu/hosts/windows.nu](../nu/hosts/windows.nu)** - Windows PATH (Git Bash, cargo, local bins).
@@ -33,7 +31,7 @@ Replaces the prior `~/.cache/ssm-env.sh` cleartext dump (deleted) and its `scrip
 - **Launch menu** - per-OS shell picker. Windows: Nushell / Git Bash / PowerShell 7 / PowerShell 5 / cmd. Mac: Nushell / zsh / bash. Linux: Nushell / bash. Bound to `Ctrl+Shift+Space`.
 - **Startup window state** - `gui-startup` event handler. On macOS, native fullscreen (own Mission Control Space) via `native_macos_fullscreen_mode = true`. On Linux/Windows, maximize.
 - **Background image** - dimmed Sombra hacking skull wallpaper from [static/wallpaper.jpg](../static/wallpaper.jpg). Brightness 0.08, saturation 0.7. Path resolves per-OS to the agentic-os checkout.
-- **Fonts** - Monaspace family bundled in [wezterm/fonts/](../wezterm/fonts/) so the config is self-contained across hosts. Per-attribute style swap: Neon (regular), Radon (italic / comments), Xenon (bold), Krypton (bold-italic), Light variant for half-intensity. `font_dirs` is additive so system emoji/glyph fallback still works.
+- **Fonts** - Monaspace family bundled in [wezterm/fonts/](../wezterm/fonts/). Per-attribute style swap (Neon/Radon/Xenon/Krypton). `font_dirs` additive so system emoji fallback still works.
 - **Theme + chrome** - Tokyo Night, 13pt, 50k scrollback, audible bell disabled, no close-window confirmation, `RESIZE`-only window decorations.
 
 ## Install surface
@@ -46,9 +44,9 @@ Replaces the prior `~/.cache/ssm-env.sh` cleartext dump (deleted) and its `scrip
 
 ## Portable utility scripts
 
-Generic-purpose scripts pulled out of `agentic-os-kai/scripts/` because they have no Kai-specific path coupling. Originals still live in agentic-os-kai for now to keep its setup.sh and commit-hook rollout working.
+Generic scripts hoisted out of `agentic-os-kai/scripts/`. Originals stay there for now to keep its setup.sh and commit-hook rollout working.
 
 - **[scripts/verbatim-echo.sh](../scripts/verbatim-echo.sh)** - run a command and emit its output wrapped in a fenced code block, clipped to 20 lines / 100 chars per line. Used by the `$$ <cmd>` chat convention so mobile chat sees command output without blowing the context window.
-- **[scripts/check-aws-config.py](../scripts/check-aws-config.py)** - lint `~/.aws/config` for the `[profile default]` trap. AWS SDKs read `[default]`, never `[profile default]`, so a `region =` placed under the latter is unreachable and surfaces later as a cryptic `NoRegion` from SSM/S3. STS-only preflights hide the bug.
-- **[scripts/gpg-ssm](../scripts/gpg-ssm)** / **[scripts/gpg-ssm.cmd](../scripts/gpg-ssm.cmd)** - GPG signing wrapper. Pulls the signing-key passphrase from AWS SSM at `/coilysiren/gpg-passphrase/<keyid>` instead of caching it in macOS Keychain or anywhere on disk. Per-host signing key keeps the blast radius of a stolen laptop to one key. Wire-up Mac/Linux: `git config --global gpg.program "$HOME/.local/bin/gpg-ssm"`. Windows uses the `.cmd` shim that wraps the same bash script via `bash.exe`, since Git for Windows can't reliably invoke extensionless shebang scripts.
+- **[scripts/check-aws-config.py](../scripts/check-aws-config.py)** - lint `~/.aws/config` for the `[profile default]` trap. AWS SDKs read `[default]`, not `[profile default]`; misplaced `region =` surfaces later as a cryptic `NoRegion` from SSM/S3.
+- **[scripts/gpg-ssm](../scripts/gpg-ssm)** / **[scripts/gpg-ssm.cmd](../scripts/gpg-ssm.cmd)** - GPG signing wrapper. Pulls the passphrase from AWS SSM at `/coilysiren/gpg-passphrase/<keyid>` rather than cache-to-disk. Per-host signing key contains stolen-laptop blast radius. Wire-up: `git config --global gpg.program "$HOME/.local/bin/gpg-ssm"` on Mac/Linux; `.cmd` shim on Windows.
 - **[scripts/check-commit-closes-issue.py](../scripts/check-commit-closes-issue.py)** - commit-msg pre-commit hook. Rejects commits that lack a same-repo GitHub closing keyword (`closes #N` / `fixes #N` / `resolves #N`, case-insensitive).
