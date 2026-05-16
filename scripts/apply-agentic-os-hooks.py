@@ -78,6 +78,7 @@ DEFAULT_HOOK_IDS = [
     "validate-skills",
     "dead-cross-links",
     "closes-issue",
+    "conventional-commit",
 ]
 
 
