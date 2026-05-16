@@ -1,21 +1,20 @@
 #!/usr/bin/env python3
-"""Cap the size of README.md and docs/FEATURES.md in catalog repos.
+"""Cap the size of README.md, AGENTS.md, and docs/FEATURES.md in catalog repos.
 
-These two files get pulled wholesale into `agentic-os-kai/data/repo-digests/`
+These three files get pulled wholesale into `agentic-os-kai/data/repo-digests/`
 by a daily compiler so agents working from agentic-os-kai's project context
 have visibility into every sibling repo. The compiler does no truncation;
-size discipline lives at the source so a single bloated README cannot push
+size discipline lives at the source so a single bloated doc cannot push
 the digest dir out of useful range.
 
 Defaults:
-    MAX_LINES = 500
-    MAX_BYTES = 25_000
+    MAX_LINES = 100
+    MAX_BYTES = 5_000
 
-Both files are optional. If a repo has no README.md, the hook is silent.
-If FEATURES.md is absent, only the README is checked.
+All files are optional. The hook is silent on any file that does not exist.
 
 Usage (when run directly):
-    python3 scripts/check-catalog-doc-size.py            # check both files
+    python3 scripts/check-catalog-doc-size.py            # check all three files
 
 Canonical copy lives in coilysiren/agentic-os/scripts/. Each consumer repo
 gets a stamped copy via agentic-os-kai's apply-catalog-doc-size-hook
@@ -29,11 +28,12 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-MAX_LINES = 500
-MAX_BYTES = 25_000
+MAX_LINES = 100
+MAX_BYTES = 5_000
 
 CHECKED_FILES = [
     Path("README.md"),
+    Path("AGENTS.md"),
     Path("docs/FEATURES.md"),
 ]
 
