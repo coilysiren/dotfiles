@@ -1,16 +1,22 @@
 repos:
-  
-  
-  # BEGIN managed by agentic-os-kai/scripts/apply-catalog-block-hook.py
+  # This repo ships the catalog hooks. Dogfood them via a local reference
+  # to the package in this checkout. Consumers reference us as
+  # repo: https://github.com/coilysiren/agentic-os instead.
   - repo: local
     hooks:
       - id: catalog-block-present
         name: .coily/coily.yaml catalog block present
-        description: Assert this repo declares its catalog metadata. See coilysiren/agentic-os-kai#420.
-        entry: python scripts/check-catalog-block.py
+        entry: python -m agentic_os.check_catalog_block
         language: python
         additional_dependencies: [pyyaml]
         always_run: true
         pass_filenames: false
         stages: [pre-commit]
-  # END managed by agentic-os-kai/scripts/apply-catalog-block-hook.py
+      # catalog-doc-size and catalog-trifecta intentionally not yet wired
+      # on this repo. README + docs/FEATURES still need See-also sections;
+      # fix in a follow-up before enabling.
+      - id: closes-issue
+        name: commit closes a GitHub issue
+        entry: python -m agentic_os.check_commit_closes_issue
+        language: python
+        stages: [commit-msg]

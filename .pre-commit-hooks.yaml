@@ -1,0 +1,69 @@
+# Cross-repo pre-commit hooks shipped by coilysiren/agentic-os.
+# Consumers reference via:
+#
+#   - repo: https://github.com/coilysiren/agentic-os
+#     rev: v0.1.0
+#     hooks:
+#       - id: catalog-doc-size
+#       - id: catalog-trifecta
+#       - id: catalog-block-present
+#       - id: validate-skills
+#       - id: dead-cross-links
+#       - id: closes-issue
+#
+# See coilysiren/agentic-os#59 for the trifecta convention.
+# Rollout helper: agentic-os/scripts/apply-agentic-os-hooks.py.
+
+- id: catalog-doc-size
+  name: README + AGENTS + docs/FEATURES size caps
+  description: Cap line and byte counts (100 lines / 5000 bytes) on the three catalog-trifecta files. See coilysiren/agentic-os-kai#545.
+  entry: check-catalog-doc-size
+  language: python
+  always_run: true
+  pass_filenames: false
+  stages: [pre-commit]
+
+- id: catalog-trifecta
+  name: catalog-trifecta cross-link convention
+  description: Enforce that README + AGENTS + docs/FEATURES + .coily/coily.yaml cross-link. See coilysiren/agentic-os#59.
+  entry: check-catalog-trifecta
+  language: python
+  always_run: true
+  pass_filenames: false
+  stages: [pre-commit]
+
+- id: catalog-block-present
+  name: .coily/coily.yaml catalog block present
+  description: Assert this repo declares its catalog metadata. See coilysiren/agentic-os-kai#420.
+  entry: check-catalog-block
+  language: python
+  additional_dependencies: [pyyaml]
+  always_run: true
+  pass_filenames: false
+  stages: [pre-commit]
+
+- id: validate-skills
+  name: skill conventions
+  description: Validate the structure of .claude/skills/ against .claude/skills/categories.yaml.
+  entry: validate-skills
+  language: python
+  additional_dependencies: [pyyaml]
+  pass_filenames: false
+  always_run: true
+  stages: [pre-commit, pre-push]
+
+- id: dead-cross-links
+  name: dead cross-links
+  description: Validate that inline markdown links inside .claude/skills/ resolve to real files.
+  entry: check-dead-links
+  language: python
+  pass_filenames: false
+  always_run: true
+  stages: [pre-commit, pre-push]
+
+- id: closes-issue
+  name: commit closes a GitHub issue
+  description: Reject commit messages without a GitHub closing keyword (closes/fixes/resolves #N) for an issue in the same repo.
+  entry: check-commit-closes-issue
+  language: python
+  stages: [commit-msg]
