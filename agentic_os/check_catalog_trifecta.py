@@ -49,9 +49,14 @@ MD_FILES = [
     Path("docs/FEATURES.md"),
 ]
 
-# The fourth member of the cross-link group. Existence-only check;
-# linked from the .md files but does not link back.
-COILY_YAML = Path(".coily/coily.yaml")
+# Fourth member of the cross-link group. Existence-only check; linked
+# from the .md files but does not link back. Two valid forms - personal
+# repos carry `.coily/coily.yaml`, external-facing repos carry
+# `.agent-guard/agent-guard.yaml`. Same data shape, different host.
+CATALOG_YAMLS = (
+    Path(".coily/coily.yaml"),
+    Path(".agent-guard/agent-guard.yaml"),
+)
 
 SEE_ALSO_HEADER = re.compile(r"^##\s+See also\s*$", re.MULTILINE)
 
@@ -97,7 +102,15 @@ def file_links_to(source_path: Path, target_path: Path, body: str) -> bool:
     return False
 
 
-def check_md_file(md_path: Path) -> list[str]:
+def resolve_catalog_yaml() -> Path | None:
+    """Return whichever catalog yaml this repo carries, if any."""
+    for candidate in CATALOG_YAMLS:
+        if (REPO_ROOT / candidate).is_file():
+            return candidate
+    return None
+
+
+def check_md_file(md_path: Path, catalog_yaml: Path) -> list[str]:
     violations: list[str] = []
     abs_path = REPO_ROOT / md_path
 
@@ -110,7 +123,7 @@ def check_md_file(md_path: Path) -> list[str]:
     if not SEE_ALSO_HEADER.search(body):
         violations.append(f"{md_path}: missing '## See also' section header.")
 
-    peers = [p for p in MD_FILES if p != md_path] + [COILY_YAML]
+    peers = [p for p in MD_FILES if p != md_path] + [catalog_yaml]
     for peer in peers:
         if not file_links_to(md_path, peer, body):
             violations.append(
@@ -129,17 +142,26 @@ def check_md_file(md_path: Path) -> list[str]:
     return violations
 
 
-def check_coily_yaml() -> list[str]:
-    if not (REPO_ROOT / COILY_YAML).is_file():
-        return [f"{COILY_YAML}: missing. Required for the catalog-trifecta group."]
+def check_catalog_yaml(catalog_yaml: Path | None) -> list[str]:
+    if catalog_yaml is None:
+        return [
+            "catalog yaml missing. Every catalog repo needs one of "
+            ".coily/coily.yaml (personal) or .agent-guard/agent-guard.yaml "
+            "(external-facing)."
+        ]
     return []
 
 
 def main() -> int:
+    catalog_yaml = resolve_catalog_yaml()
     all_violations: list[str] = []
+    # Use the resolved catalog yaml if present; otherwise fall back to the
+    # canonical .coily/coily.yaml path for the link-presence checks (so the
+    # error message names a concrete file even when none exists).
+    link_target = catalog_yaml or CATALOG_YAMLS[0]
     for md in MD_FILES:
-        all_violations.extend(check_md_file(md))
-    all_violations.extend(check_coily_yaml())
+        all_violations.extend(check_md_file(md, link_target))
+    all_violations.extend(check_catalog_yaml(catalog_yaml))
 
     if not all_violations:
         print("catalog-trifecta check: OK")
