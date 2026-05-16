@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.2.3](https://github.com/coilysiren/agentic-os/compare/v0.2.2...v0.2.3) (2026-05-16)
+
+
+### Documentation
+
+* repoint archived claude-skill-discipline refs to coilysiren/agentic-os ([0030b1c](https://github.com/coilysiren/agentic-os/commit/0030b1c05a9061c51cb5054474182d265a600fde)), closes [#71](https://github.com/coilysiren/agentic-os/issues/71)
+* skill-authoring co-location uses apply-agentic-os-hooks ([b3b21da](https://github.com/coilysiren/agentic-os/commit/b3b21da3b7cbc7dea481d00deb4c5e98cfab0a06)), closes [#73](https://github.com/coilysiren/agentic-os/issues/73)
+* strip historical-context prose per agentic-os-kai[#574](https://github.com/coilysiren/agentic-os/issues/574) ([ff55668](https://github.com/coilysiren/agentic-os/commit/ff556683d43b0a4d1a1a243dd97a8a96c90bff81)), closes [#68](https://github.com/coilysiren/agentic-os/issues/68)
+
 ## [0.2.2](https://github.com/coilysiren/agentic-os/compare/v0.2.1...v0.2.2) (2026-05-16)
 
 
