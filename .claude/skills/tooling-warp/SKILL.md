@@ -46,10 +46,11 @@ Panes are off. Splitting one tab into multiple panes is rejected as a navigation
 In `[appearance.vertical_tabs]`:
 
 - `enabled = true` - vertical tabs on. The whole UX bet.
-- `primary_info = "process"` - tab label is the running process (`claude`, `zsh`, `code`, `ssh`). cwd is useless because Kai is in `~/projects/coilysiren/*` 95% of the time.
-- `compact_subtitle = "command"` - last command as subtitle line under the process. Two layers of info per tab row.
-- `view_mode = "compact"` - dense list. Open question whether to flip to non-compact at 6-tab average; revisit if rows look too dense.
-- `display_granularity = "tabs"` - one row per tab, not per pane. Panes are off.
+- `primary_info` - per docs, valid values are `{command, working_directory, branch}`. Kai rejected `working_directory` because she's in `~/projects/coilysiren/*` 95% of the time. Current value is settled in the UI; whatever it is, don't revert to `working_directory`.
+- `compact_subtitle` - per docs, valid values are `{branch, working_directory}`, but `command` is also accepted (undocumented variant). Current value lives in the file and is settled.
+- `display_granularity = "tabs"` - one row per tab, not per pane. Panes are off, see tab discipline above.
+
+`primary_info = "process"` is NOT a valid value, even though it sounds plausible. Setting it logs `Failed to parse file value for setting VerticalTabsPrimaryInfo` then `Inhibiting writes for setting key appearance.vertical_tabs.primary_info` in `~/Library/Logs/warp.log`, after which the file's value for that key is ignored.
 
 ## Host portability
 
@@ -66,29 +67,59 @@ Until Kai installs on Windows, leave the Mac path as-is.
 
 ## AI / Agent surface (the noise-cut)
 
-Warp ships several AI surfaces. Kai uses Claude Code for AI work; Warp is terminal-only. Five of six knobs flipped off via the file (verified by quit/relaunch loop in coilysiren/agentic-os#56):
+Kai uses Claude Code for AI work; Warp is terminal-only. The master kill switch is:
 
-- `[agents.profiles] agent_mode_execute_readonly_commands = false`
-- `[agents.warp_agent.input] ai_auto_detection_enabled = false`
-- `[agents.warp_agent.input] nld_in_terminal_enabled = false`
-- `[code.indexing] agent_mode_codebase_context_auto_indexing = false`
-- `[general] default_session_mode = "terminal"` - new tab is a shell, not a chat surface.
+- `[agents.warp_agent] is_any_ai_enabled = false`
 
-The sixth, `[agents] cloud_conversation_storage_enabled`, is the one knob that resists file-edits. Warp writes `true` back to the file on every cold launch, regardless of what the file says and regardless of `is_settings_sync_enabled = false`. Account-state has its own source of truth that overrides. **To actually disable it, toggle the corresponding option in Warp's UI (Settings > AI > Conversation storage or similar).** Warp will then write `false` to both its internal state and the file, and the file will stop being overwritten.
+Set this, the entire Warp Agent surface goes dark. Every sub-toggle (Active AI, Next Command, Prompt Suggestions, Autodetect agent prompts, Autodetect terminal commands, etc.) is gated by it.
 
-Open question: whether Warp has a hard kill-switch for the agent-panel keyboard shortcut (Cmd+I or similar). If not, the next-best mitigation is rebinding it to nothing in Settings > Keyboard. Verify in the real UI.
+The sub-knobs (under `[agents.warp_agent.input]`, `[agents.profiles]`, `[agents.knowledge]`, `[agents.warp_agent.active_ai]`, `[code.indexing]`) are kept set to `false` in the file as defense in depth. They don't have effect while the master is off, but they stop noise from leaking back if anything ever flips the master.
+
+The one knob that resists file edits is `[agents] cloud_conversation_storage_enabled`. Warp rewrites `true` to it on every cold launch from cloud account state, regardless of `is_settings_sync_enabled = false`. To actually disable, toggle the corresponding option in Warp's UI. After that Warp will write `false` to both the file and its account state.
+
+`[general] default_session_mode = "terminal"` is separate from the AI surface but related: it controls whether a new tab opens as a shell or as a chat surface. Keep at `"terminal"`.
+
+Open question: whether Warp has a hard kill-switch for the agent-panel keyboard shortcut (Cmd+I or similar). Empirically the master kill switch is sufficient for getting the surface out of the way; the shortcut may still open an empty/disabled panel. Verify in the real UI when convenient.
+
+## How settings.toml interacts with SQLite
+
+Per Warp's docs, the app watches `settings.toml` and applies changes instantly. Empirically observed behavior matches:
+
+- The file is the source of truth at startup. Warp reads it, applies values to in-memory state.
+- When you change something in the Warp UI, Warp writes the new value back to `settings.toml`. Existing keys get updated in place. New sections get appended.
+- A parallel SQLite store (`~/Library/Group Containers/2BBY89MBSN.dev.warp/Library/Application Support/dev.warp.Warp-Stable/warp.sqlite`, table `generic_string_objects`, keyed by `storage_key`) caches the same state. Both file and SQLite end up holding the same values after a UI change.
+- The one observed exception is `cloud_conversation_storage_enabled`, which Warp rewrites from cloud account state on every cold launch regardless of `is_settings_sync_enabled = false`. Cloud account state is its own source of truth for that key.
+
+For peeking at SQLite to debug a setting mystery:
+
+```bash
+sqlite3 ~/Library/Group\ Containers/2BBY89MBSN.dev.warp/Library/Application\ Support/dev.warp.Warp-Stable/warp.sqlite \
+  "SELECT data FROM generic_string_objects ORDER BY id;" | grep -i <KeyNamePartial>
+```
+
+The `storage_key` is the SQLite name (e.g. `VerticalTabsPrimaryInfo`); the TOML path is the snake_case form under the corresponding section (e.g. `[appearance.vertical_tabs] primary_info`). Map between the two by grepping the Warp binary:
+
+```bash
+strings /Applications/Warp.app/Contents/MacOS/stable | grep -oE '[a-z_]+\.[a-z_]+\.[a-z_]+'
+```
 
 ## settings.toml schema gotchas
 
 Enums in this file are strict-validated against Rust enum variants in the Warp binary. Wrong values get a `Failed to parse file value for setting <Name>` error in `~/Library/Logs/warp.log` and an `Inhibiting writes for setting key <key>` follow-up, after which Warp ignores the file's value entirely. Recovery is to fix the value and relaunch.
 
-To find valid enum variants without docs, grep the binary:
+Three places to find valid values, in order of trust:
 
-```bash
-strings /Applications/Warp.app/Contents/MacOS/stable | grep -oE '<EnumName>[A-Z][a-zA-Z]*' | sort -u
-```
+1. **The docs** - [all-settings reference](https://docs.warp.dev/terminal/settings/all-settings/) and [settings file overview](https://docs.warp.dev/terminal/settings/). Authoritative for what's officially supported.
+2. **The Warp binary** - grep for enum variants directly:
 
-For example, `VerticalTabsPrimaryInfo` resolves to `{Command, WorkingDirectory, Branch}` (serialized as snake_case in TOML: `command`, `working_directory`, `branch`). Do not guess. `primary_info = "process"` is not a valid value and Warp will reject it.
+   ```bash
+   strings /Applications/Warp.app/Contents/MacOS/stable | grep -oE '<EnumName>[A-Z][a-zA-Z]*' | sort -u
+   ```
+
+   For example, `VerticalTabsPrimaryInfo` resolves to `{Command, WorkingDirectory, Branch}` (serialized as snake_case in TOML: `command`, `working_directory`, `branch`).
+3. **Set it in the UI and read what Warp writes to the file.** Most reliable but slow.
+
+Note: some accepted values are undocumented (e.g. `compact_subtitle = "command"` is accepted by Warp but not in the docs). Trust the binary over the docs when they disagree.
 
 ## Inline rich rendering
 
