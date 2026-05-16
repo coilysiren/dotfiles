@@ -2,7 +2,7 @@
 
 **Purpose.** This file is the single source of truth for everything uniform and structured about `<personal-os-repo>/.claude/skills/`. Read it cold and you should be able to recreate the repo's skill organization from scratch: the category taxonomy, the canonical SKILL.md shape per category, the validator, the templates, the pre-commit wiring, the cross-link rules, and the rules for adding a new category.
 
-This file is paired with [`categories.yaml`](../../categories.yaml) (at `.claude/skills/categories.yaml`), the machine-readable spec consumed by the upstream `claude-skill-discipline` validator. When the two disagree, the YAML is authoritative for the validator and this file should be updated to match.
+This file is paired with [`categories.yaml`](../../categories.yaml) (at `.claude/skills/categories.yaml`), the machine-readable spec consumed by the `coilysiren/agentic-os` skill-discipline validator. When the two disagree, the YAML is authoritative for the validator and this file should be updated to match.
 
 ## 1. Layout
 
@@ -34,7 +34,7 @@ This file is paired with [`categories.yaml`](../../categories.yaml) (at `.claude
 ├── scripts/
 │   ├── check-em-dashes.py                      # local voice-rule hook
 │   └── leak-check.py                           # local private-string denylist
-└── .pre-commit-config.yaml                     # subscribes to claude-skill-discipline + local hooks
+└── .pre-commit-config.yaml                     # subscribes to coilysiren/agentic-os hooks + local hooks
 ```
 
 **No skills outside `.claude/skills/`.** No skills inside other skills' directories. Flat is the only shape the loader supports.
@@ -158,7 +158,7 @@ Free-form. Frontmatter still enforced.
 
 ## 6. Validators
 
-The structural validator and dead-link checker are vendored from the public [`claude-skill-discipline`](https://github.com/coilysiren/claude-skill-discipline) repo and consumed via pre-commit. The em-dash check is a small local hook because the upstream is voice-neutral by design.
+The structural validator and dead-link checker ship from [`coilysiren/agentic-os`](https://github.com/coilysiren/agentic-os) and are consumed via pre-commit. The em-dash check is a small local hook because the upstream is voice-neutral by design.
 
 ### `skill-conventions` (upstream) - structural check
 
@@ -198,7 +198,7 @@ What it skips intentionally:
 
 ### Pre-commit wiring
 
-`.pre-commit-config.yaml` subscribes to `coilysiren/claude-skill-discipline` at a pinned tag (currently `v0.2.0`) for `skill-conventions`, `dead-cross-links`, and `commit-closes-issue`. The four local hooks (`trufflehog`, `leak-check`, `em-dash-check`, `setup-symlinks`, plus the `coily-trailer` prepare-commit-msg hook) stay as `repo: local` entries.
+`.pre-commit-config.yaml` subscribes to `coilysiren/agentic-os` at a pinned tag for `skill-conventions`, `dead-cross-links`, and `commit-closes-issue`. The four local hooks (`trufflehog`, `leak-check`, `em-dash-check`, `setup-symlinks`, plus the `coily-trailer` prepare-commit-msg hook) stay as `repo: local` entries.
 
 Bump the `rev:` to pull upstream changes. Add new local checks as new `repo: local` hook entries.
 

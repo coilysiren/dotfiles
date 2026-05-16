@@ -1,6 +1,6 @@
 # Skill Discipline Handbook
 
-This handbook documents the discipline that `claude-skill-discipline` enforces. It pairs with [`examples/categories.yaml`](../examples/categories.yaml) (the machine-readable spec) and the three pre-commit hooks declared in [`.pre-commit-hooks.yaml`](../.pre-commit-hooks.yaml).
+This handbook documents the skill-discipline rules enforced by the pre-commit hooks shipped from this repo. It pairs with [`examples/categories.yaml`](../examples/categories.yaml) (the machine-readable spec) and the hooks declared in [`.pre-commit-hooks.yaml`](../../.pre-commit-hooks.yaml).
 
 If your repo follows this handbook, the hooks will pass. If they disagree, the spec is authoritative for the validator and this file should be updated to match.
 
