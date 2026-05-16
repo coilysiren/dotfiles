@@ -535,8 +535,14 @@ def main(argv: list[str] | None = None) -> int:
     SPEC_PATH = SKILLS_DIR / "categories.yaml"
 
     if not SKILLS_DIR.is_dir():
-        sys.stderr.write(f"validate_skills.py: {SKILLS_DIR} not found\n")
-        return 2
+        # Repos without a skills surface are a no-op. Lets a single
+        # upstream-ref pre-commit block cover the whole catalog without
+        # blocking commits in repos that have no .claude/skills/ at all.
+        return 0
+    if not SPEC_PATH.is_file():
+        # Same shape: a partial skills surface (e.g. a placeholder dir)
+        # without categories.yaml is also a silent no-op.
+        return 0
 
     report_only = ns.report_only
     args = ns.names

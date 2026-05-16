@@ -167,8 +167,10 @@ def main(argv: list[str] | None = None) -> int:
         roots = [Path(a).resolve() for a in ns.paths]
     else:
         if not SKILLS_DIR.is_dir():
-            sys.stderr.write(f"check_dead_links.py: {SKILLS_DIR} not found\n")
-            return 2
+            # Repos without a skills surface are a no-op. Lets a single
+            # upstream-ref pre-commit block cover the whole catalog
+            # without blocking commits in repos with no .claude/skills/.
+            return 0
         roots = [SKILLS_DIR]
 
     all_violations: list[str] = []
