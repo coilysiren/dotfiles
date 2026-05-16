@@ -62,7 +62,7 @@ font_size = 11.0
 notebook_font_size = 14.0
 
 [appearance.window]
-zoom_level = 50
+zoom_level = 100
 
 [appearance.themes]
 theme = "phenomenon"
