@@ -1,6 +1,6 @@
 # skill-discipline
 
-Pre-commit hooks and authoring docs for Claude Code skill repositories. Migrated from `coilysiren/claude-skill-discipline` into `coilysiren/agentic-os`. See [agentic-os-kai#544](https://github.com/coilysiren/agentic-os-kai/issues/544).
+Pre-commit hooks and authoring docs for Claude Code skill repositories.
 
 ## Hooks
 

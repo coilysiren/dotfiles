@@ -1,12 +1,8 @@
 # agentic-os
 
-(Formerly `coilysiren/dotfiles`. Renamed 2026-05-15 as the repo grows into broader personal-OS / agentic-OS scope beyond just shell config.)
-
 ![Sombra hacking skull](static/wallpaper.jpg)
 
 Cross-platform shell + terminal setup. Zsh on Mac, Linux, and Windows (Git Bash). Warp on Mac and Windows; both configs (`warp/settings.toml`, `warp/tab_configs/startup_config.toml`) symlinked into `~/.warp/`.
-
-A previous iteration of this repo carried Nushell + WezTerm configs. That migration was rolled back; both trees were deleted in coilysiren/agentic-os#48. Git history retains them if either ever needs to come back.
 
 ## Layout
 
