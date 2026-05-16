@@ -4,7 +4,7 @@
 
 ![Sombra hacking skull](static/wallpaper.jpg)
 
-Cross-platform shell setup. Zsh on Mac, Linux, and Windows (Git Bash). Warp is the terminal on all three, configured in-app (`~/.warp/settings.toml`), not in this repo.
+Cross-platform shell + terminal setup. Zsh on Mac, Linux, and Windows (Git Bash). Warp on Mac and Windows; both configs (`warp/settings.toml`, `warp/tab_configs/startup_config.toml`) symlinked into `~/.warp/`.
 
 A previous iteration of this repo carried Nushell + WezTerm configs. That migration was rolled back; both trees were deleted in coilysiren/agentic-os#48. Git history retains them if either ever needs to come back.
 
@@ -15,6 +15,8 @@ A previous iteration of this repo carried Nushell + WezTerm configs. That migrat
 - `zsh/hosts/{macos,linux,windows}.zsh` - per-host PATH and tooling. Picked automatically via `uname -s`.
 - `zsh/config.zsh` - aliases, git helpers, `rg` wrapper, prompt (two-line siren motif).
 - `zsh/ssm-env.zsh` - in-process AWS SSM secret loader. `ssm-load` reads `/coilysiren/*` into the current shell env. Never disk.
+- `warp/settings.toml` - Warp config. Vertical tabs, theme, font, custom secret-regex list, AI/agent toggles. `[account] is_settings_sync_enabled = false` so the repo wins over cloud sync.
+- `warp/tab_configs/startup_config.toml` - default new-tab pane setup.
 - `scripts/` - portable utilities not specific to the shell.
   - `verbatim-echo.sh` - wrap a command's output in a fenced block clipped to 20 lines / 100 chars per line. Chat-safe dumps for mobile.
   - `check-aws-config.py` - reject the `[profile default]` trap in `~/.aws/config` that surfaces later as a cryptic `NoRegion` from SSM/S3.
@@ -28,9 +30,13 @@ A previous iteration of this repo carried Nushell + WezTerm configs. That migrat
 
 ```bash
 ln -sf "$PWD/zsh/zshrc" ~/.zshrc
-mkdir -p ~/.local/bin
+mkdir -p ~/.warp/tab_configs ~/.local/bin
+ln -sf "$PWD/warp/settings.toml" ~/.warp/settings.toml
+ln -sf "$PWD/warp/tab_configs/startup_config.toml" ~/.warp/tab_configs/startup_config.toml
 ln -sf "$PWD/scripts/gpg-ssm" ~/.local/bin/gpg-ssm
 ```
+
+(After symlinking Warp settings, restart Warp once so it re-reads. If a UI toggle silently snaps back to default, check that `[account] is_settings_sync_enabled` is still `false` - cloud sync will overwrite the symlink target.)
 
 Login shell defaults to `/bin/zsh`. If a previous shell-switch needs undoing:
 
