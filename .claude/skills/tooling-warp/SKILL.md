@@ -66,16 +66,29 @@ Until Kai installs on Windows, leave the Mac path as-is.
 
 ## AI / Agent surface (the noise-cut)
 
-Warp ships several AI surfaces. Kai uses Claude Code for AI work; Warp is terminal-only. All six knobs flipped off in coilysiren/agentic-os#56:
+Warp ships several AI surfaces. Kai uses Claude Code for AI work; Warp is terminal-only. Five of six knobs flipped off via the file (verified by quit/relaunch loop in coilysiren/agentic-os#56):
 
 - `[agents.profiles] agent_mode_execute_readonly_commands = false`
 - `[agents.warp_agent.input] ai_auto_detection_enabled = false`
 - `[agents.warp_agent.input] nld_in_terminal_enabled = false`
 - `[code.indexing] agent_mode_codebase_context_auto_indexing = false`
-- `[agents] cloud_conversation_storage_enabled = false`
 - `[general] default_session_mode = "terminal"` - new tab is a shell, not a chat surface.
 
+The sixth, `[agents] cloud_conversation_storage_enabled`, is the one knob that resists file-edits. Warp writes `true` back to the file on every cold launch, regardless of what the file says and regardless of `is_settings_sync_enabled = false`. Account-state has its own source of truth that overrides. **To actually disable it, toggle the corresponding option in Warp's UI (Settings > AI > Conversation storage or similar).** Warp will then write `false` to both its internal state and the file, and the file will stop being overwritten.
+
 Open question: whether Warp has a hard kill-switch for the agent-panel keyboard shortcut (Cmd+I or similar). If not, the next-best mitigation is rebinding it to nothing in Settings > Keyboard. Verify in the real UI.
+
+## settings.toml schema gotchas
+
+Enums in this file are strict-validated against Rust enum variants in the Warp binary. Wrong values get a `Failed to parse file value for setting <Name>` error in `~/Library/Logs/warp.log` and an `Inhibiting writes for setting key <key>` follow-up, after which Warp ignores the file's value entirely. Recovery is to fix the value and relaunch.
+
+To find valid enum variants without docs, grep the binary:
+
+```bash
+strings /Applications/Warp.app/Contents/MacOS/stable | grep -oE '<EnumName>[A-Z][a-zA-Z]*' | sort -u
+```
+
+For example, `VerticalTabsPrimaryInfo` resolves to `{Command, WorkingDirectory, Branch}` (serialized as snake_case in TOML: `command`, `working_directory`, `branch`). Do not guess. `primary_info = "process"` is not a valid value and Warp will reject it.
 
 ## Inline rich rendering
 
