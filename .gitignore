@@ -1,5 +1,7 @@
 .DS_Store
 *.swp
+__pycache__/
+*.pyc
 
 # Defensive entries against secret drift
 .env
