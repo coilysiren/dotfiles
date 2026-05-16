@@ -20,41 +20,74 @@ Canonical files live at `~/projects/coilysiren/agentic-os/warp/`, symlinked into
 
 If a settings-pane toggle silently disappears the next time Warp restarts, suspect cloud-sync was flipped back on and check `[account]` in the file.
 
+## Why Warp instead of a classic terminal
+
+Two pieces, together. Don't regress either:
+
+- **Block-mode terminal.** Each command groups with its output as a discrete block. Click any past block to copy, share, or jump back. Errors get a red gutter. Long output collapses. This is the main reason Warp exists.
+- **Tab as session anchor.** Each vertical tab keeps its own cwd, scrollback, env, and running processes. Switching tabs is switching context, not re-typing it. Like browser tabs for shell sessions.
+
+The unit of work is a block, the unit of context is a tab.
+
+## Tab discipline
+
+Kai's typical Warp session is 4-7 tabs, one shell per tab, no splitting:
+
+- 1 plain shell (true blank canvas).
+- 1 file viewer (running `bat`-wrapped reflexes, see coilysiren/agentic-os#57).
+- 1 status watcher (running `watch -n 5 '<command>'` for health checks).
+- 4 cloud agents (typically Claude Code sessions).
+- Optional: 1 persistent `ssh kai-server` tab if homelab work is hot.
+
+Panes are off. Splitting one tab into multiple panes is rejected as a navigation primitive; if a status display is needed, it gets its own tab. This is why `display_granularity = "tabs"` (not `"panes"`).
+
+## Settings that must not regress
+
+In `[appearance.vertical_tabs]`:
+
+- `enabled = true` - vertical tabs on. The whole UX bet.
+- `primary_info = "process"` - tab label is the running process (`claude`, `zsh`, `code`, `ssh`). cwd is useless because Kai is in `~/projects/coilysiren/*` 95% of the time.
+- `compact_subtitle = "command"` - last command as subtitle line under the process. Two layers of info per tab row.
+- `view_mode = "compact"` - dense list. Open question whether to flip to non-compact at 6-tab average; revisit if rows look too dense.
+- `display_granularity = "tabs"` - one row per tab, not per pane. Panes are off.
+
 ## Host portability
 
 One line is host-absolute and will not work cross-platform as-written:
 
 - `[general] default_tab_config_path = "/Users/kai/.warp/tab_configs/startup_config.toml"`
 
-On Windows, this needs to be `C:\Users\kai\.warp\tab_configs\startup_config.toml`. Two options for handling this when it comes up:
+On Windows, this needs `C:\Users\kai\.warp\tab_configs\startup_config.toml`. Two options when Windows comes up:
 
 1. Per-host override - leave Mac path in repo, edit Windows copy in place after symlinking (breaks the symlink-as-source-of-truth model).
-2. Drop `default_tab_config_path` entirely - Warp falls back to a default new-tab. Re-add only if the named startup tab is load-bearing.
+2. Drop `default_tab_config_path` entirely - Warp falls back to a default new-tab. Re-add only if the named startup tab is needed.
 
 Until Kai installs on Windows, leave the Mac path as-is.
 
-## Tabs as the navigation primitive
+## AI / Agent surface (the noise-cut)
 
-Vertical tabs (`[appearance.vertical_tabs] enabled = true`) is the load-bearing UI choice. Block-mode terminal + tab-as-context-anchor is why Warp lives. When tweaking the file, do not regress these:
+Warp ships several AI surfaces. Kai uses Claude Code for AI work; Warp is terminal-only. All six knobs flipped off in coilysiren/agentic-os#56:
 
-- `enabled = true`
-- `primary_info = "working_directory"` - tab label shows cwd, not command
-- `compact_subtitle = "command"` - last command as subtitle
-- `view_mode = "compact"` - dense list, more tabs visible
-- `display_granularity = "panes"` - one row per pane, not per tab
+- `[agents.profiles] agent_mode_execute_readonly_commands = false`
+- `[agents.warp_agent.input] ai_auto_detection_enabled = false`
+- `[agents.warp_agent.input] nld_in_terminal_enabled = false`
+- `[code.indexing] agent_mode_codebase_context_auto_indexing = false`
+- `[agents] cloud_conversation_storage_enabled = false`
+- `[general] default_session_mode = "terminal"` - new tab is a shell, not a chat surface.
 
-## AI / Agent surface
+Open question: whether Warp has a hard kill-switch for the agent-panel keyboard shortcut (Cmd+I or similar). If not, the next-best mitigation is rebinding it to nothing in Settings > Keyboard. Verify in the real UI.
 
-Warp ships several AI surfaces. Kai uses Claude Code for AI work; Warp doesn't need to be a second one. Knobs to watch when noise comes back:
+## Inline rich rendering
 
-- `[agents.profiles] agent_mode_execute_readonly_commands` - Warp will auto-run readonly commands. Currently on. Off if surprise-execution is unwanted.
-- `[agents.warp_agent.input] ai_auto_detection_enabled` - Warp guesses when input is natural-language vs command. Currently on.
-- `[agents.warp_agent.input] nld_in_terminal_enabled` - natural language dispatcher in the prompt.
-- `[code.indexing] agent_mode_codebase_context_auto_indexing` - Warp indexes the repo for AI context.
-- `[agents] cloud_conversation_storage_enabled` - if Warp AI is used, conversations go to Warp's cloud.
-- `[general] default_session_mode` - "terminal" (current) or "agent". Keep terminal so a new tab is a shell, not a chat surface.
+Warp renders:
 
-Flipping all of these off in one pass is the obvious noise-cut; doing it surgically gives a smaller noise reduction with less feature loss. See the noise-reduction recon thread.
+- Clickable URLs and clickable file paths in output (OSC 8 hyperlinks).
+- Images via the iTerm2 inline image protocol. So `imgcat foo.png` shows the image in the block.
+- Pretty-printed tables when output is structured (e.g. `ls -l`).
+
+The `open` wrapper in coilysiren/agentic-os#57 routes image extensions to `imgcat` and falls back to `command open` for everything else. `chafa` is the universal terminal image/video renderer if Warp's native protocol doesn't cover a case.
+
+Less sure: whether Warp renders raw markdown in shell-mode output (agent panel definitely does). Verify when relevant.
 
 ## Common edits
 
@@ -62,3 +95,8 @@ Flipping all of these off in one pass is the obvious noise-cut; doing it surgica
 - **Font size** - `[appearance.text] font_size = 11.0` and `notebook_font_size = 14.0`.
 - **Custom secret regexes** - `[privacy] custom_secret_regex_list` is a TOML array of `{ name, pattern }` tables. Patterns are detection-only (block redaction is off, see `[privacy.secret_redaction] enabled = false`).
 - **Subshell auto-warpify** - `[warpify.subshells] added_subshell_commands` makes Warp render blocks for commands like `docker compose run` that drop into an inner shell.
+
+## See also
+
+- coilysiren/agentic-os#57 - terminal file-viewer wrapper functions (`bat`, `view`, `open`, etc.).
+- coilysiren/agentic-os#58 - Brewfile catalog of modern CLI tools.
