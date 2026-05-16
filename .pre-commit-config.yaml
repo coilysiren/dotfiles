@@ -20,3 +20,6 @@ repos:
         entry: python -m agentic_os.check_commit_closes_issue
         language: python
         stages: [commit-msg]
+  # No managed upstream-ref block here. This repo is the source; the rollout
+  # is expected to never run against agentic-os itself. The local block above
+  # dogfoods the validators via the in-checkout package.

@@ -196,6 +196,11 @@ def install_pre_commit_hooks(repo_dir: Path) -> str:
 
 
 def apply_to_repo(repo: str, rev: str, dry_run: bool) -> tuple[str, str]:
+    if repo == "agentic-os":
+        # This repo IS the source. Local .pre-commit-config.yaml dogfoods
+        # the validators via repo: local + python -m agentic_os.<module>.
+        # Inserting an upstream-ref block would duplicate hook IDs.
+        return ("skipped", "self (source repo)")
     repo_dir = SIBLINGS_ROOT / repo
     if not repo_dir.is_dir():
         return ("skipped", "not checked out locally")
