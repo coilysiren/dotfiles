@@ -19,7 +19,7 @@ The rest of this file carries opinionated authoring discipline the handbook does
 
 When co-locating, the host repo must:
 
-1. Receive the skill-discipline pre-commit hooks via `make apply-skill-discipline-hooks` from `agentic-os-kai`. That rollout stamps `scripts/validate-skills.py` and `scripts/check-dead-links.py` into the host repo (canonical copies live in [`coilysiren/agentic-os/scripts/`](https://github.com/coilysiren/agentic-os/tree/main/scripts)) and inserts a managed `repo: local` block in `.pre-commit-config.yaml`. See [agentic-os-kai#544](https://github.com/coilysiren/agentic-os-kai/issues/544).
+1. Receive the skill-discipline pre-commit hooks (`validate-skills`, `dead-cross-links`) plus the rest of the catalog suite via `make apply-agentic-os-hooks` from `agentic-os-kai`. That rollout inserts one managed `repo: https://github.com/coilysiren/agentic-os` block into the host's `.pre-commit-config.yaml`. No stamped local copies. The validators live in the `agentic_os` Python package; pre-commit pip-installs them. See [coilysiren/agentic-os#61](https://github.com/coilysiren/agentic-os/issues/61).
 2. Ship a slim `.claude/skills/categories.yaml` at the skills root with only the categories the repo actually uses. The validator reads this path directly.
 3. Run `pre-commit install` in the host repo. That activates the hooks for every commit.
 
