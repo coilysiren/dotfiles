@@ -76,11 +76,6 @@ No disk write at any point. Same call works on Mac, Linux, Windows. AWS profile 
 
 If you want secrets at shell startup, append `ssm-load` to the end of `zsh/config.zsh`. Default behavior is opt-in per shell.
 
-## What's not here (yet)
-
-- Login-shell switching - documented above, not automated.
-- Work machine config stays separate, with its own bash-script dependencies. This repo is personal-only.
-
 ## Credits
 
 - `static/wallpaper.jpg` - Sombra hacking skull, from the [Overwatch](https://overwatch.blizzard.com) Sombra ARG promotional materials, Blizzard Entertainment, circa 2016. All Overwatch art and iconography © Blizzard Entertainment. Used here for personal terminal decoration only.
