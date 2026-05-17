@@ -62,7 +62,12 @@ font_size = 11.0
 notebook_font_size = 14.0
 
 [appearance.themes]
-theme = "phenomenon"
+theme = {
+  custom = {
+    name = "Coilysiren Sombra (Wallpaper)",
+    path = "~/.warp/themes/coilysiren-sombra-wallpaper.yaml",
+  },
+}
 
 [appearance.tabs]
 workspace_decoration_visibility = "always_show"
