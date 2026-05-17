@@ -65,7 +65,7 @@ notebook_font_size = 14.0
 theme = {
   custom = {
     name = "Coilysiren Sombra (Wallpaper)",
-    path = "~/.warp/themes/coilysiren-sombra-wallpaper.yaml",
+    path = "/Users/kai/.warp/themes/coilysiren-sombra-wallpaper.yaml",
   },
 }
 

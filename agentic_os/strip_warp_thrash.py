@@ -1,39 +1,31 @@
 #!/usr/bin/env python3
 """Strip GUI-induced thrash from warp/settings.toml on commit.
 
-Warp persists transient GUI state (zoom level, host-absolute theme paths)
-back into settings.toml on every nudge. Without a normalizer the file
-churns every commit and breaks portability across hosts.
+Warp persists transient GUI state (zoom level) back into settings.toml on
+every nudge. Without a normalizer the file churns every commit.
 
-Two surgical fixes, regex-based to preserve TOML comments and layout:
-
-1. Remove `zoom_level` lines under `[appearance.window]`. Collapse the
-   section header if no keys remain.
-2. Rewrite `path = "<abs>/.warp/themes/<file>"` inside custom-theme
-   blocks to `path = "~/.warp/themes/<file>"` so Warp expands per-host.
+Regex-based to preserve TOML comments and layout. Removes `zoom_level`
+lines under `[appearance.window]`. Collapses the section header if no
+keys remain.
 
 Auto-fix mode: edits files in place, exits 1 if any file changed, 0
 otherwise. Standard pre-commit auto-fix contract.
 
-Origin: coilysiren/agentic-os#80.
+Theme `path` normalization was tried in the first cut (#80) and reverted
+in #81 because Warp does not expand `~` in theme paths. Cross-host theme
+portability needs a heavier template-on-setup approach, tracked separately.
+
+Origin: coilysiren/agentic-os#80, #81.
 """
 
 from __future__ import annotations
 
-import re
 import sys
 from pathlib import Path
 
 
-WARP_THEMES_PATH_RE = re.compile(
-    r'(path\s*=\s*")(?P<abs>/[^"]*?/\.warp/themes/)(?P<file>[^"/]+\.ya?ml)(")',
-)
-
-
 def strip(text: str) -> str:
-    out = _strip_zoom_level(text)
-    out = _normalize_theme_path(out)
-    return out
+    return _strip_zoom_level(text)
 
 
 def _strip_zoom_level(text: str) -> str:
@@ -74,13 +66,6 @@ def _strip_zoom_level(text: str) -> str:
 def _is_section_header(line: str) -> bool:
     stripped = line.strip()
     return stripped.startswith("[") and stripped.endswith("]")
-
-
-def _normalize_theme_path(text: str) -> str:
-    def repl(m: re.Match[str]) -> str:
-        return f'{m.group(1)}~/.warp/themes/{m.group("file")}{m.group(4)}'
-
-    return WARP_THEMES_PATH_RE.sub(repl, text)
 
 
 def main(argv: list[str] | None = None) -> int:
