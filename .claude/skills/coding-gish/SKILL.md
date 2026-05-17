@@ -24,7 +24,7 @@ Kai dictates "gish" (or any trigger from the description). The current working t
 - The issue must be in the **same repo** as the commit. Same-repo `closes #N` is what the `closes-issue` pre-commit hook enforces; a cross-repo reference is rejected.
 - Never skip step 2. The hook will block you anyway.
 - Never run destructive git operations (reset --hard, push --force, branch -D) inside this flow.
-- If the commit fails on a pre-commit hook, fix the issue and create a **new** commit. Do not `--amend` per AGENTS.md.
+- If the commit fails on a pre-commit hook, fix the issue and `git commit --amend` rather than stacking a "fix lint" follow-on commit. Amend is preferred for linter / hook fixes per AGENTS.md (unpushed commits only; force-push is still off-limits). If the amend materially changes the diff relative to what the closing issue described, leave a comment on the GH issue noting the amendment.
 
 ## Cross-links
 
