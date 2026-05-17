@@ -1,52 +1,45 @@
 # Features
 
-Baseline of what `agentic-os` ships today. Update when a feature is added, removed, or materially reshaped.
+What `agentic-os` does. Cross-platform shell, terminal, and secret-handling for every host Kai runs. Public, generic, leak-safe by construction.
 
-## Nushell config
+This doc describes capabilities, not files. If you want a file inventory, run `ls`.
 
-Cross-platform nu startup files, symlinked into the OS-specific nu config dir at install time.
+## Cross-platform shell
 
-- **[nu/env.nu](../nu/env.nu)** - sourced first at startup. Sets `LANG`, `EDITOR`, `GIT_EDITOR`, `SSH_KEY_PATH`, `CLI_MFA`, `AWS_PROFILE`, `AWS_REGION`, `AWS_PAGER`, `COILY_LOCKDOWN_ROOT`. Then sources the matching host file.
-- **[nu/config.nu](../nu/config.nu)** - aliases, a wrapped `rg` with hidden-file globs, ported git helpers (`git-default-branch`, `git-pr-title`, `git-merge-default-branch`, `git-checkpoint`, `git-squash`), `docker-bash`, `pull-all-repos`, `github-token-load`. Imports `ssm-env.nu`.
-- **[nu/hosts/macos.nu](../nu/hosts/macos.nu)** - Mac PATH (homebrew, cargo, ruby, openjdk, gradle, dotnet, fabro), `JAVA_HOME`, `NODE_EXTRA_CA_CERTS` for the local Caddy root.
-- **[nu/hosts/linux.nu](../nu/hosts/linux.nu)** - Linux PATH (linuxbrew, cargo, local bins). Designed for kai-server.
-- **[nu/hosts/windows.nu](../nu/hosts/windows.nu)** - Windows PATH (Git Bash, cargo, local bins).
-
-Per-host file is picked at startup via `$nu.os-info.name`, so no manual branching.
+Single zsh config tree that boots cleanly on Mac, Linux (kai-server), and Windows (Git Bash). Picks the right host file via `uname -s` so there's no manual branching. Symlinked into `~/.zshrc` per host. Carries identity, history, AWS defaults, prompt, git helpers, aliases, an `rg` wrapper, and `COILY_LOCKDOWN_ROOT` for the coily security boundary.
 
 ## In-process AWS SSM secret loader
 
-[nu/ssm-env.nu](../nu/ssm-env.nu) provides two exported commands:
+Pull secrets directly into the shell environment, never to disk. `ssm-load` reads every SecureString under the configured prefix and `load-env`s them. `ssm-get <name>` fetches a single value to stdout. Replaces the older cleartext-dump-to-cache pattern with a memory-only path.
 
-- **`ssm-load`** - pulls every SSM SecureString under `/` from the named profile (defaults to `default`, `us-east-1`) and `load-env`s them into the current nu process. Var name derivation matches the legacy script: `/foo/bar-baz` -> `FOO_BAR_BAZ`. Never writes to disk.
-- **`ssm-get <name>`** - fetches a single parameter value, prints it, no disk write.
+## Cross-platform terminal
 
-Replaces the prior `~/.cache/ssm-env.sh` cleartext dump (deleted) and its `scripts/ssm-export-lines.sh` generator (also deleted).
+Single Warp config tree symlinked into `~/.warp/` on Mac and Windows. The repo wins over cloud sync (`is_settings_sync_enabled = false`) so theme, font, vertical tabs, AI/agent toggles, and the secret-redaction regex list stay reproducible across hosts. The redaction surface covers IPv4/IPv6, MAC, AWS keys, GitHub tokens (every variant), Stripe, Firebase, JWT, OpenAI/Anthropic/Fireworks/Google keys, Slack tokens, phone numbers.
 
-## WezTerm config
+## GPG signing without disk-cached passphrases
 
-[wezterm/wezterm.lua](../wezterm/wezterm.lua) - single Lua config used on all three OSes. Symlinked to `~/.wezterm.lua` on Mac/Linux and `%USERPROFILE%\.wezterm.lua` on Windows.
+`gpg-ssm` is a wrapper around `gpg` that pulls the per-host signing-key passphrase from AWS SSM at sign time instead of caching it on disk. Per-host signing keys keep stolen-laptop blast radius bounded. Mac/Linux + Windows (`.cmd` shim for Git for Windows, which can't reliably exec extensionless shebang scripts). Wire it in once with `git config --global gpg.program`.
 
-- **Cross-platform nu resolution** - walks `/opt/homebrew/bin/nu`, `/usr/local/bin/nu`, `~/.cargo/bin/nu`, `/home/linuxbrew/.linuxbrew/bin/nu`, falls back to bare `nu` on PATH.
-- **Launch menu** - per-OS shell picker. Windows: Nushell / Git Bash / PowerShell 7 / PowerShell 5 / cmd. Mac: Nushell / zsh / bash. Linux: Nushell / bash. Bound to `Ctrl+Shift+Space`.
-- **Startup window state** - `gui-startup` event handler. On macOS, native fullscreen (own Mission Control Space) via `native_macos_fullscreen_mode = true`. On Linux/Windows, maximize.
-- **Background image** - dimmed Sombra hacking skull wallpaper from [static/wallpaper.jpg](../static/wallpaper.jpg). Brightness 0.08, saturation 0.7. Path resolves per-OS to the agentic-os checkout.
-- **Fonts** - Monaspace family bundled in [wezterm/fonts/](../wezterm/fonts/). Per-attribute style swap (Neon/Radon/Xenon/Krypton). `font_dirs` additive so system emoji fallback still works.
-- **Theme + chrome** - Tokyo Night, 13pt, 50k scrollback, audible bell disabled, no close-window confirmation, `RESIZE`-only window decorations.
+## Cross-repo pre-commit baseline
+
+Ships the canonical hook IDs that every `coilysiren/*` repo pins via `rev:`: catalog doc-size enforcement, README/AGENTS/FEATURES trifecta presence, skill structural validation, dead cross-link detection, `closes #N` commit-msg enforcement, and the `catalog-block-present` check. Consumers don't stamp local copies of the validators; the `agentic-os` Python package is pip-installed into each repo's pre-commit env. Rolled out and audited from `agentic-os-kai`.
+
+## Diagnostic + utility helpers
+
+Small, single-purpose scripts that exist because the failure modes they handle are cryptic by default:
+
+- AWS config linter that catches the `[profile default]` trap (SDKs read `[default]`, misplaced region surfaces later as a useless `NoRegion`).
+- Verbatim-echo wrapper that fences command output and clips to mobile-readable size, for the `$$ <cmd>` chat convention.
+- GPG signing doctor that walks every check needed to diagnose `failed to sign the data` and names the most-likely fix per failure mode.
 
 ## Install surface
 
-[README.md](../README.md) carries per-OS install steps. Mac and Linux use symlinks; Windows uses copy (symlinks need admin/dev mode).
+[README.md](../README.md) carries per-OS install steps. Mac/Linux use plain `ln -sf`. Windows uses symlinks via Git Bash, which requires Developer Mode + `MSYS=winsymlinks:nativestrict`.
 
-## Diagnostic scripts
+## See also
 
-- **[scripts/gpg-doctor.nu](../scripts/gpg-doctor.nu)** - walks every check needed to diagnose `gpg failed to sign the data` from a `git commit`. Verifies binaries, gpg-agent socket, git config, secret-key presence, optional YubiKey, then runs a real sign test. Names the most-likely fix for each failure mode. Run with `nu scripts/gpg-doctor.nu`.
+- [README.md](../README.md) - human-facing intro.
+- [AGENTS.md](../AGENTS.md) - agent-facing operating rules (delegates to `agentic-os-kai/AGENTS.md`).
+- [.coily/coily.yaml](../.coily/coily.yaml) - allowlisted commands.
 
-## Portable utility scripts
-
-Generic scripts hoisted out of `agentic-os-kai/scripts/`. Originals stay there for now to keep its setup.sh and commit-hook rollout working.
-
-- **[scripts/verbatim-echo.sh](../scripts/verbatim-echo.sh)** - run a command and emit its output wrapped in a fenced code block, clipped to 20 lines / 100 chars per line. Used by the `$$ <cmd>` chat convention so mobile chat sees command output without blowing the context window.
-- **[scripts/check-aws-config.py](../scripts/check-aws-config.py)** - lint `~/.aws/config` for the `[profile default]` trap. AWS SDKs read `[default]`, not `[profile default]`; misplaced `region =` surfaces later as a cryptic `NoRegion` from SSM/S3.
-- **[scripts/gpg-ssm](../scripts/gpg-ssm)** / **[scripts/gpg-ssm.cmd](../scripts/gpg-ssm.cmd)** - GPG signing wrapper. Pulls the passphrase from AWS SSM at `/coilysiren/gpg-passphrase/<keyid>` rather than cache-to-disk. Per-host signing key contains stolen-laptop blast radius. Wire-up: `git config --global gpg.program "$HOME/.local/bin/gpg-ssm"` on Mac/Linux; `.cmd` shim on Windows.
-- **[scripts/check-commit-closes-issue.py](../scripts/check-commit-closes-issue.py)** - commit-msg pre-commit hook. Rejects commits that lack a same-repo GitHub closing keyword (`closes #N` / `fixes #N` / `resolves #N`, case-insensitive).
+Cross-reference convention from [coilysiren/agentic-os-kai#313](https://github.com/coilysiren/agentic-os-kai/issues/313).
