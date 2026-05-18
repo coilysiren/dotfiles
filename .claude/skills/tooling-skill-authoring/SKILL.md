@@ -1,6 +1,6 @@
 ---
 name: tooling-skill-authoring
-description: Author, modify, and validate Claude Code skills. Covers skill location, naming/category prefixes, alias-packing in descriptions, encode-the-why discipline, flat-not-nested layout, Python-helpers bias, and plugin marketplace fast-forward. Use whenever the user wants to make a new skill, turn an in-session workflow into a reusable skill, or codify a pattern. Triggers - skill, SKILL.md, frontmatter, plugin, .claude/skills, authoring skill, skill description, alias, validator, handbook, categories.yaml, skill template.
+description: Author, modify, and validate Claude Code skills. Covers skill location, naming/category prefixes, description-size discipline, encode-the-why, flat-not-nested layout, Python-helpers bias, and plugin marketplace fast-forward. Triggers - skill, SKILL.md, frontmatter, plugin, .claude/skills, authoring skill, validator, categories.yaml.
 ---
 
 # Skill authoring
@@ -81,7 +81,11 @@ Flagged 2026-04-26.
 
 ## Frontmatter aliases
 
-Users forget exact skill names. The `description` field is **keyword-matched for triggering**, so pack aliases liberally into it. Lead with the canonical name + 5-10 synonyms or natural-language phrasings users might reach for. Don't be terse about this; the aliases are the discoverability surface.
+Lead with the canonical name plus 2-3 natural-language phrasings a user might reach for. Hard ceiling. If a skill needs more trigger surface than that, the fix is a better name, a router parent (see `coily-shared-meta`, `ops-social-gws-gmail`, `kai-execution-mode` for the pattern), or splitting the skill. Not a longer description.
+
+**Why:** the `description` field is eager-loaded into every Claude turn forever. Aliases are paid only per invocation. At 121 skills, ~71 KB of description text already crowds the catalog surface, and the system-reminder catalog truncates past ~80 entries, so selection accuracy degrades from sheer surface size before token cost even enters the picture. Alias-packing is the most expensive possible layer to solve discoverability at. Filed as [agentic-os-kai#583](https://github.com/coilysiren/agentic-os-kai/issues/583).
+
+**How to apply:** when authoring a new skill, write `description:` as one sentence of purpose plus 2-3 phrasings. When tempted to add a fourth alias, rename the skill or hoist a router parent instead. LUCA-driven cold-skill pruning (future audit chain) will validate whether existing aliases earn their bytes; the sweep against the new ceiling is a separate follow-on.
 
 ## Plugin marketplace installs (gauntlet etc.)
 
