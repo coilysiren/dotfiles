@@ -1,6 +1,6 @@
 ---
 name: tooling-gpg-ssm
-description: gpg-ssm is a GPG wrapper that pulls signing passphrases from AWS SSM at sign time instead of caching on disk. Use when wiring up a new host for signed commits, rotating a per-host key, debugging signing failures (no caller identity, missing SSM param, Git Bash path mangling), or considering bypassing the wrapper for any reason. Triggers - gpg-ssm, gpg signing, GPG, signed commits, user.signingkey, gpg-passphrase, gpg-agent, --passphrase-fd, pinentry-mode loopback, MSYS_NO_PATHCONV, per-host key, gpg.program.
+description: gpg-ssm is a GPG wrapper that pulls signing passphrases from AWS SSM at sign time instead of caching on disk. Use when wiring up a new host for signed commits, rotating a per-host key, or debugging signing failures. Triggers - gpg-ssm, gpg signing, signed commits.
 ---
 
 # gpg-ssm
