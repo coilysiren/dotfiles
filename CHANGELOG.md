@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.4](https://github.com/coilysiren/agentic-os/compare/v0.2.3...v0.2.4) (2026-05-18)
+
+
+### Documentation
+
+* **FEATURES:** rewrite as capability description ([3a37d54](https://github.com/coilysiren/agentic-os/commit/3a37d547a3c9df59430d033887b30998f4eedeaa)), closes [#82](https://github.com/coilysiren/agentic-os/issues/82)
+
 ## [0.2.3](https://github.com/coilysiren/agentic-os/compare/v0.2.2...v0.2.3) (2026-05-16)
 
 
