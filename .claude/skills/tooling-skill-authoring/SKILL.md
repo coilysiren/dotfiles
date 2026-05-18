@@ -81,7 +81,7 @@ Flagged 2026-04-26.
 
 ## Frontmatter aliases
 
-Lead with the canonical name plus 2-3 natural-language phrasings a user might reach for. Hard ceiling. If a skill needs more trigger surface than that, the fix is a better name, a router parent (see `coily-shared-meta`, `ops-social-gws-gmail`, `kai-execution-mode` for the pattern), or splitting the skill. Not a longer description.
+Lead with the canonical name plus 2-3 natural-language phrasings a user might reach for. Hard ceiling. If a skill needs more trigger surface than that, the fix is a better name, a router parent (see `coily-meta`, `ops-social-gws-gmail`, `kai-execution-mode` for the pattern), or splitting the skill. Not a longer description.
 
 **Why:** the `description` field is eager-loaded into every Claude turn forever. Aliases are paid only per invocation. At 121 skills, ~71 KB of description text already crowds the catalog surface, and the system-reminder catalog truncates past ~80 entries, so selection accuracy degrades from sheer surface size before token cost even enters the picture. Alias-packing is the most expensive possible layer to solve discoverability at. Filed as [agentic-os-kai#583](https://github.com/coilysiren/agentic-os-kai/issues/583).
 
